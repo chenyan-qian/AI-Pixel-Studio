@@ -1,0 +1,18 @@
+0 verbose cli C:\software\node.exe C:\software\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v24.16.0
+3 silly config load:file:C:\software\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npmrc
+5 silly config load:file:C:\Users\34026\.npmrc
+6 silly config load:file:C:\Users\34026\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm run build
+8 verbose argv "run" "build" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npm-cache\_logs\2026-07-14T07_17_47_970Z-
+10 verbose logfile C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npm-cache\_logs\2026-07-14T07_17_47_970Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose cwd C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台
+13 verbose os Windows_NT 10.0.26100
+14 verbose node v24.16.0
+15 verbose npm  v11.13.0
+16 verbose exit 1
+17 verbose code 1

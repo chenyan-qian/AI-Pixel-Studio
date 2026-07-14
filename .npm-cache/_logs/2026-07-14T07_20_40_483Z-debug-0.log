@@ -1,0 +1,645 @@
+0 verbose cli C:\software\node.exe C:\software\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v24.16.0
+3 silly config load:file:C:\software\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npmrc
+5 silly config load:file:C:\Users\34026\.npmrc
+6 silly config load:file:C:\Users\34026\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".npm-cache" "--no-audit" "--no-fund" "--fetch-timeout" "10000" "--fetch-retries" "1" "--loglevel" "warn"
+9 verbose logfile logs-max:10 dir:C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npm-cache\_logs\2026-07-14T07_20_40_483Z-
+10 verbose logfile C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台\.npm-cache\_logs\2026-07-14T07_20_40_483Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @tailwindcss/oxide-android-arm64@4.3.2
+15 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-android-arm64 cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-android-arm64 757ms (cache revalidated)
+17 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-android-arm64 set size:2089108 disposed:false
+18 silly fetch manifest @tailwindcss/oxide-darwin-arm64@4.3.2
+19 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-darwin-arm64 cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-darwin-arm64 232ms (cache revalidated)
+21 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-darwin-arm64 set size:2948329 disposed:false
+22 silly fetch manifest @tailwindcss/oxide-darwin-x64@4.3.2
+23 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-darwin-x64 cache-miss
+24 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-darwin-x64 224ms (cache revalidated)
+25 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-darwin-x64 set size:2912662 disposed:false
+26 silly fetch manifest @tailwindcss/oxide-linux-arm-gnueabihf@4.3.2
+27 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm-gnueabihf cache-miss
+28 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm-gnueabihf 638ms (cache revalidated)
+29 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm-gnueabihf set size:3025434 disposed:false
+30 silly fetch manifest @tailwindcss/oxide-freebsd-x64@4.3.2
+31 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-freebsd-x64 cache-miss
+32 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-freebsd-x64 237ms (cache revalidated)
+33 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-freebsd-x64 set size:2927530 disposed:false
+34 silly fetch manifest @tailwindcss/oxide-linux-arm64-gnu@4.3.2
+35 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-gnu cache-miss
+36 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-gnu 623ms (cache revalidated)
+37 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-gnu set size:2999623 disposed:false
+38 silly fetch manifest @tailwindcss/oxide-linux-arm64-musl@4.3.2
+39 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-musl cache-miss
+40 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-musl 276ms (cache revalidated)
+41 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-arm64-musl set size:3010932 disposed:false
+42 silly fetch manifest @tailwindcss/oxide-linux-x64-gnu@4.3.2
+43 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-gnu cache-miss
+44 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-gnu 204ms (cache revalidated)
+45 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-gnu set size:2972860 disposed:false
+46 silly fetch manifest @tailwindcss/oxide-linux-x64-musl@4.3.2
+47 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-musl cache-miss
+48 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-musl 236ms (cache revalidated)
+49 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-linux-x64-musl set size:2981904 disposed:false
+50 silly fetch manifest @tailwindcss/oxide-wasm32-wasi@4.3.2
+51 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-wasm32-wasi cache-miss
+52 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-wasm32-wasi 206ms (cache revalidated)
+53 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-wasm32-wasi set size:1514314 disposed:false
+54 silly fetch manifest @tailwindcss/oxide-win32-arm64-msvc@4.3.2
+55 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-win32-arm64-msvc cache-miss
+56 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide-win32-arm64-msvc 200ms (cache revalidated)
+57 silly packumentCache full:https://registry.npmjs.org/@tailwindcss%2foxide-win32-arm64-msvc set size:2065604 disposed:false
+58 silly placeDep ROOT @tailwindcss/oxide-android-arm64@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+59 silly placeDep ROOT @tailwindcss/oxide-darwin-arm64@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+60 silly placeDep ROOT @tailwindcss/oxide-darwin-x64@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+61 silly placeDep ROOT @tailwindcss/oxide-freebsd-x64@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+62 silly placeDep ROOT @tailwindcss/oxide-linux-arm-gnueabihf@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+63 silly placeDep ROOT @tailwindcss/oxide-linux-arm64-gnu@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+64 silly placeDep ROOT @tailwindcss/oxide-linux-arm64-musl@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+65 silly placeDep ROOT @tailwindcss/oxide-linux-x64-gnu@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+66 silly placeDep ROOT @tailwindcss/oxide-linux-x64-musl@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+67 silly placeDep ROOT @tailwindcss/oxide-wasm32-wasi@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+68 silly placeDep ROOT @tailwindcss/oxide-win32-arm64-msvc@4.3.2 OK for: @tailwindcss/oxide@4.3.2 want: 4.3.2
+69 silly fetch manifest lightningcss-darwin-x64@1.32.0
+70 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-x64 cache-miss
+71 http fetch GET 200 https://registry.npmjs.org/lightningcss-darwin-x64 218ms (cache revalidated)
+72 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-x64 set size:78694 disposed:false
+73 silly fetch manifest lightningcss-linux-x64-gnu@1.32.0
+74 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-gnu cache-miss
+75 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-x64-gnu 592ms (cache revalidated)
+76 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-gnu set size:80105 disposed:false
+77 silly fetch manifest lightningcss-win32-arm64-msvc@1.32.0
+78 silly packumentCache full:https://registry.npmjs.org/lightningcss-win32-arm64-msvc cache-miss
+79 http fetch GET 200 https://registry.npmjs.org/lightningcss-win32-arm64-msvc 190ms (cache revalidated)
+80 silly packumentCache full:https://registry.npmjs.org/lightningcss-win32-arm64-msvc set size:26629 disposed:false
+81 silly fetch manifest lightningcss-darwin-arm64@1.32.0
+82 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-arm64 cache-miss
+83 http fetch GET 200 https://registry.npmjs.org/lightningcss-darwin-arm64 187ms (cache revalidated)
+84 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-arm64 set size:79276 disposed:false
+85 silly fetch manifest lightningcss-linux-arm64-gnu@1.32.0
+86 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-gnu cache-miss
+87 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm64-gnu 180ms (cache revalidated)
+88 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-gnu set size:80669 disposed:false
+89 silly fetch manifest lightningcss-linux-arm-gnueabihf@1.32.0
+90 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf cache-miss
+91 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf 189ms (cache revalidated)
+92 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf set size:80903 disposed:false
+93 silly fetch manifest lightningcss-linux-arm64-musl@1.32.0
+94 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-musl cache-miss
+95 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm64-musl 224ms (cache revalidated)
+96 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-musl set size:80887 disposed:false
+97 silly fetch manifest lightningcss-linux-x64-musl@1.32.0
+98 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-musl cache-miss
+99 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-x64-musl 222ms (cache revalidated)
+100 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-musl set size:80313 disposed:false
+101 silly fetch manifest lightningcss-freebsd-x64@1.32.0
+102 silly packumentCache full:https://registry.npmjs.org/lightningcss-freebsd-x64 cache-miss
+103 http fetch GET 200 https://registry.npmjs.org/lightningcss-freebsd-x64 185ms (cache revalidated)
+104 silly packumentCache full:https://registry.npmjs.org/lightningcss-freebsd-x64 set size:42877 disposed:false
+105 silly fetch manifest lightningcss-android-arm64@1.32.0
+106 silly packumentCache full:https://registry.npmjs.org/lightningcss-android-arm64 cache-miss
+107 http fetch GET 200 https://registry.npmjs.org/lightningcss-android-arm64 186ms (cache revalidated)
+108 silly packumentCache full:https://registry.npmjs.org/lightningcss-android-arm64 set size:7671 disposed:false
+109 silly placeDep ROOT lightningcss-android-arm64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+110 silly placeDep ROOT lightningcss-darwin-arm64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+111 silly placeDep ROOT lightningcss-darwin-x64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+112 silly placeDep ROOT lightningcss-freebsd-x64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+113 silly placeDep ROOT lightningcss-linux-arm-gnueabihf@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+114 silly placeDep ROOT lightningcss-linux-arm64-gnu@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+115 silly placeDep ROOT lightningcss-linux-arm64-musl@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+116 silly placeDep ROOT lightningcss-linux-x64-gnu@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+117 silly placeDep ROOT lightningcss-linux-x64-musl@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+118 silly placeDep ROOT lightningcss-win32-arm64-msvc@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+119 silly fetch manifest @next/swc-darwin-arm64@15.1.1
+120 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-darwin-arm64 cache-miss
+121 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-darwin-arm64 213ms (cache revalidated)
+122 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-darwin-arm64 set size:5406341 disposed:false
+123 silly fetch manifest @next/swc-darwin-x64@15.1.1
+124 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-darwin-x64 cache-miss
+125 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-darwin-x64 472ms (cache revalidated)
+126 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-darwin-x64 set size:5347993 disposed:false
+127 silly fetch manifest @next/swc-linux-arm64-gnu@15.1.1
+128 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-arm64-gnu cache-miss
+129 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-linux-arm64-gnu 245ms (cache revalidated)
+130 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-arm64-gnu set size:5261526 disposed:false
+131 silly fetch manifest @next/swc-linux-arm64-musl@15.1.1
+132 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-arm64-musl cache-miss
+133 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-linux-arm64-musl 213ms (cache revalidated)
+134 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-arm64-musl set size:5280041 disposed:false
+135 silly fetch manifest @next/swc-linux-x64-gnu@15.1.1
+136 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-x64-gnu cache-miss
+137 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-linux-x64-gnu 469ms (cache revalidated)
+138 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-x64-gnu set size:5457522 disposed:false
+139 silly fetch manifest @next/swc-linux-x64-musl@15.1.1
+140 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-x64-musl cache-miss
+141 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-linux-x64-musl 398ms (cache revalidated)
+142 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-linux-x64-musl set size:5213439 disposed:false
+143 silly fetch manifest @next/swc-win32-arm64-msvc@15.1.1
+144 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-win32-arm64-msvc cache-miss
+145 http fetch GET 200 https://registry.npmjs.org/@next%2fswc-win32-arm64-msvc 261ms (cache revalidated)
+146 silly packumentCache full:https://registry.npmjs.org/@next%2fswc-win32-arm64-msvc set size:5242995 disposed:false
+147 silly placeDep ROOT @next/swc-darwin-arm64@15.1.1 OK for: next@15.1.1 want: 15.1.1
+148 silly placeDep ROOT @next/swc-darwin-x64@15.1.1 OK for: next@15.1.1 want: 15.1.1
+149 silly placeDep ROOT @next/swc-linux-arm64-gnu@15.1.1 OK for: next@15.1.1 want: 15.1.1
+150 silly placeDep ROOT @next/swc-linux-arm64-musl@15.1.1 OK for: next@15.1.1 want: 15.1.1
+151 silly placeDep ROOT @next/swc-linux-x64-gnu@15.1.1 OK for: next@15.1.1 want: 15.1.1
+152 silly placeDep ROOT @next/swc-linux-x64-musl@15.1.1 OK for: next@15.1.1 want: 15.1.1
+153 silly placeDep ROOT @next/swc-win32-arm64-msvc@15.1.1 OK for: next@15.1.1 want: 15.1.1
+154 silly fetch manifest @img/sharp-darwin-arm64@0.33.5
+155 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-darwin-arm64 cache-miss
+156 http cache https://registry.npmjs.org/@img%2fsharp-darwin-arm64 7ms (cache hit)
+157 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-darwin-arm64 set size:105848 disposed:false
+158 silly fetch manifest @img/sharp-darwin-x64@0.33.5
+159 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-darwin-x64 cache-miss
+160 http cache https://registry.npmjs.org/@img%2fsharp-darwin-x64 3ms (cache hit)
+161 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-darwin-x64 set size:104467 disposed:false
+162 silly fetch manifest @img/sharp-libvips-darwin-arm64@1.0.4
+163 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-darwin-arm64 cache-miss
+164 http cache https://registry.npmjs.org/@img%2fsharp-libvips-darwin-arm64 4ms (cache hit)
+165 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-darwin-arm64 set size:83997 disposed:false
+166 silly fetch manifest @img/sharp-libvips-darwin-x64@1.0.4
+167 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-darwin-x64 cache-miss
+168 http cache https://registry.npmjs.org/@img%2fsharp-libvips-darwin-x64 4ms (cache hit)
+169 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-darwin-x64 set size:83096 disposed:false
+170 silly fetch manifest @img/sharp-libvips-linux-arm@1.0.5
+171 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm cache-miss
+172 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm 4ms (cache hit)
+173 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm set size:90480 disposed:false
+174 silly fetch manifest @img/sharp-libvips-linux-arm64@1.0.4
+175 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm64 cache-miss
+176 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm64 3ms (cache hit)
+177 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-arm64 set size:87554 disposed:false
+178 silly fetch manifest @img/sharp-libvips-linux-s390x@1.0.4
+179 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-s390x cache-miss
+180 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linux-s390x 3ms (cache hit)
+181 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-s390x set size:81565 disposed:false
+182 silly fetch manifest @img/sharp-libvips-linux-x64@1.0.4
+183 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-x64 cache-miss
+184 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linux-x64 4ms (cache hit)
+185 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linux-x64 set size:86327 disposed:false
+186 silly fetch manifest @img/sharp-libvips-linuxmusl-arm64@1.0.4
+187 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-arm64 cache-miss
+188 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-arm64 3ms (cache hit)
+189 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-arm64 set size:86720 disposed:false
+190 silly fetch manifest @img/sharp-libvips-linuxmusl-x64@1.0.4
+191 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-x64 cache-miss
+192 http cache https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-x64 3ms (cache hit)
+193 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-libvips-linuxmusl-x64 set size:83650 disposed:false
+194 silly fetch manifest @img/sharp-linux-arm@0.33.5
+195 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-arm cache-miss
+196 http cache https://registry.npmjs.org/@img%2fsharp-linux-arm 4ms (cache hit)
+197 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-arm set size:102715 disposed:false
+198 silly fetch manifest @img/sharp-linux-arm64@0.33.5
+199 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-arm64 cache-miss
+200 http cache https://registry.npmjs.org/@img%2fsharp-linux-arm64 3ms (cache hit)
+201 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-arm64 set size:103552 disposed:false
+202 silly fetch manifest @img/sharp-linux-s390x@0.33.5
+203 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-s390x cache-miss
+204 http cache https://registry.npmjs.org/@img%2fsharp-linux-s390x 3ms (cache hit)
+205 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-s390x set size:101430 disposed:false
+206 silly fetch manifest @img/sharp-linux-x64@0.33.5
+207 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-x64 cache-miss
+208 http cache https://registry.npmjs.org/@img%2fsharp-linux-x64 4ms (cache hit)
+209 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linux-x64 set size:102218 disposed:false
+210 silly fetch manifest @img/sharp-linuxmusl-arm64@0.33.5
+211 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linuxmusl-arm64 cache-miss
+212 http cache https://registry.npmjs.org/@img%2fsharp-linuxmusl-arm64 3ms (cache hit)
+213 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linuxmusl-arm64 set size:105157 disposed:false
+214 silly fetch manifest @img/sharp-linuxmusl-x64@0.33.5
+215 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linuxmusl-x64 cache-miss
+216 http cache https://registry.npmjs.org/@img%2fsharp-linuxmusl-x64 3ms (cache hit)
+217 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-linuxmusl-x64 set size:103818 disposed:false
+218 silly fetch manifest @img/sharp-wasm32@0.33.5
+219 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-wasm32 cache-miss
+220 http cache https://registry.npmjs.org/@img%2fsharp-wasm32 3ms (cache hit)
+221 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-wasm32 set size:99309 disposed:false
+222 silly fetch manifest @img/sharp-win32-ia32@0.33.5
+223 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-win32-ia32 cache-miss
+224 http cache https://registry.npmjs.org/@img%2fsharp-win32-ia32 4ms (cache hit)
+225 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-win32-ia32 set size:104482 disposed:false
+226 silly fetch manifest @img/sharp-win32-x64@0.33.5
+227 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-win32-x64 cache-miss
+228 http cache https://registry.npmjs.org/@img%2fsharp-win32-x64 3ms (cache hit)
+229 silly packumentCache full:https://registry.npmjs.org/@img%2fsharp-win32-x64 set size:103513 disposed:false
+230 silly placeDep ROOT @img/sharp-darwin-arm64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+231 silly placeDep ROOT @img/sharp-darwin-x64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+232 silly placeDep ROOT @img/sharp-libvips-darwin-arm64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+233 silly placeDep ROOT @img/sharp-libvips-darwin-x64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+234 silly placeDep ROOT @img/sharp-libvips-linux-arm@1.0.5 OK for: sharp@0.33.5 want: 1.0.5
+235 silly placeDep ROOT @img/sharp-libvips-linux-arm64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+236 silly placeDep ROOT @img/sharp-libvips-linux-s390x@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+237 silly placeDep ROOT @img/sharp-libvips-linux-x64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+238 silly placeDep ROOT @img/sharp-libvips-linuxmusl-arm64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+239 silly placeDep ROOT @img/sharp-libvips-linuxmusl-x64@1.0.4 OK for: sharp@0.33.5 want: 1.0.4
+240 silly placeDep ROOT @img/sharp-linux-arm@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+241 silly placeDep ROOT @img/sharp-linux-arm64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+242 silly placeDep ROOT @img/sharp-linux-s390x@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+243 silly placeDep ROOT @img/sharp-linux-x64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+244 silly placeDep ROOT @img/sharp-linuxmusl-arm64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+245 silly placeDep ROOT @img/sharp-linuxmusl-x64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+246 silly placeDep ROOT @img/sharp-wasm32@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+247 silly placeDep ROOT @img/sharp-win32-ia32@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+248 silly placeDep node_modules/sharp @img/sharp-win32-x64@0.33.5 OK for: sharp@0.33.5 want: 0.33.5
+249 silly fetch manifest @emnapi/runtime@^1.2.0
+250 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime cache-miss
+251 http cache https://registry.npmjs.org/@emnapi%2fruntime 6ms (cache hit)
+252 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime set size:118526 disposed:false
+253 silly placeDep ROOT @emnapi/runtime@1.11.2 OK for: @img/sharp-wasm32@0.33.5 want: ^1.2.0
+254 silly fetch manifest @unrs/resolver-binding-darwin-arm64@1.12.2
+255 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-arm64 cache-miss
+256 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-arm64 7ms (cache hit)
+257 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-arm64 set size:63676 disposed:false
+258 silly fetch manifest @unrs/resolver-binding-android-arm64@1.12.2
+259 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm64 cache-miss
+260 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm64 4ms (cache hit)
+261 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm64 set size:17616 disposed:false
+262 silly fetch manifest @unrs/resolver-binding-win32-arm64-msvc@1.12.2
+263 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-win32-arm64-msvc cache-miss
+264 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-win32-arm64-msvc 4ms (cache hit)
+265 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-win32-arm64-msvc set size:64613 disposed:false
+266 silly fetch manifest @unrs/resolver-binding-linux-arm64-gnu@1.12.2
+267 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-gnu cache-miss
+268 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-gnu 4ms (cache hit)
+269 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-gnu set size:65047 disposed:false
+270 silly fetch manifest @unrs/resolver-binding-linux-arm64-musl@1.12.2
+271 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-musl cache-miss
+272 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-musl 3ms (cache hit)
+273 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm64-musl set size:65257 disposed:false
+274 silly fetch manifest @unrs/resolver-binding-openharmony-arm64@1.12.2
+275 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-openharmony-arm64 cache-miss
+276 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-openharmony-arm64 4ms (cache hit)
+277 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-openharmony-arm64 set size:7350 disposed:false
+278 silly fetch manifest @unrs/resolver-binding-android-arm-eabi@1.12.2
+279 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm-eabi cache-miss
+280 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm-eabi 3ms (cache hit)
+281 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-android-arm-eabi set size:17797 disposed:false
+282 silly fetch manifest @unrs/resolver-binding-linux-arm-gnueabihf@1.12.2
+283 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-gnueabihf cache-miss
+284 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-gnueabihf 3ms (cache hit)
+285 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-gnueabihf set size:65279 disposed:false
+286 silly fetch manifest @unrs/resolver-binding-linux-arm-musleabihf@1.12.2
+287 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-musleabihf cache-miss
+288 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-musleabihf 3ms (cache hit)
+289 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-arm-musleabihf set size:65533 disposed:false
+290 silly fetch manifest @unrs/resolver-binding-win32-ia32-msvc@1.12.2
+291 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-win32-ia32-msvc cache-miss
+292 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-win32-ia32-msvc 3ms (cache hit)
+293 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-win32-ia32-msvc set size:64317 disposed:false
+294 silly fetch manifest @unrs/resolver-binding-linux-loong64-gnu@1.12.2
+295 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-gnu cache-miss
+296 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-gnu 3ms (cache hit)
+297 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-gnu set size:4107 disposed:false
+298 silly fetch manifest @unrs/resolver-binding-linux-loong64-musl@1.12.2
+299 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-musl cache-miss
+300 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-musl 4ms (cache hit)
+301 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-loong64-musl set size:4124 disposed:false
+302 silly fetch manifest @unrs/resolver-binding-linux-ppc64-gnu@1.12.2
+303 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-ppc64-gnu cache-miss
+304 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-ppc64-gnu 3ms (cache hit)
+305 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-ppc64-gnu set size:65057 disposed:false
+306 silly fetch manifest @unrs/resolver-binding-linux-riscv64-gnu@1.12.2
+307 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-gnu cache-miss
+308 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-gnu 4ms (cache hit)
+309 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-gnu set size:56387 disposed:false
+310 silly fetch manifest @unrs/resolver-binding-linux-riscv64-musl@1.12.2
+311 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-musl cache-miss
+312 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-musl 3ms (cache hit)
+313 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-riscv64-musl set size:45710 disposed:false
+314 silly fetch manifest @unrs/resolver-binding-linux-s390x-gnu@1.12.2
+315 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-s390x-gnu cache-miss
+316 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-s390x-gnu 3ms (cache hit)
+317 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-s390x-gnu set size:65047 disposed:false
+318 silly fetch manifest @unrs/resolver-binding-wasm32-wasi@1.12.2
+319 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-wasm32-wasi cache-miss
+320 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-wasm32-wasi 4ms (cache hit)
+321 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-wasm32-wasi set size:67358 disposed:false
+322 silly fetch manifest @unrs/resolver-binding-darwin-x64@1.12.2
+323 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-x64 cache-miss
+324 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-x64 4ms (cache hit)
+325 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-darwin-x64 set size:63092 disposed:false
+326 silly fetch manifest @unrs/resolver-binding-freebsd-x64@1.12.2
+327 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-freebsd-x64 cache-miss
+328 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-freebsd-x64 3ms (cache hit)
+329 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-freebsd-x64 set size:63388 disposed:false
+330 silly fetch manifest @unrs/resolver-binding-linux-x64-gnu@1.12.2
+331 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-gnu cache-miss
+332 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-gnu 5ms (cache hit)
+333 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-gnu set size:64469 disposed:false
+334 silly fetch manifest @unrs/resolver-binding-linux-x64-musl@1.12.2
+335 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-musl cache-miss
+336 http cache https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-musl 4ms (cache hit)
+337 silly packumentCache full:https://registry.npmjs.org/@unrs%2fresolver-binding-linux-x64-musl set size:64685 disposed:false
+338 silly placeDep ROOT @unrs/resolver-binding-android-arm-eabi@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+339 silly placeDep ROOT @unrs/resolver-binding-android-arm64@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+340 silly placeDep ROOT @unrs/resolver-binding-darwin-arm64@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+341 silly placeDep ROOT @unrs/resolver-binding-darwin-x64@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+342 silly placeDep ROOT @unrs/resolver-binding-freebsd-x64@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+343 silly placeDep ROOT @unrs/resolver-binding-linux-arm-gnueabihf@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+344 silly placeDep ROOT @unrs/resolver-binding-linux-arm-musleabihf@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+345 silly placeDep ROOT @unrs/resolver-binding-linux-arm64-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+346 silly placeDep ROOT @unrs/resolver-binding-linux-arm64-musl@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+347 silly placeDep ROOT @unrs/resolver-binding-linux-loong64-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+348 silly placeDep ROOT @unrs/resolver-binding-linux-loong64-musl@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+349 silly placeDep ROOT @unrs/resolver-binding-linux-ppc64-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+350 silly placeDep ROOT @unrs/resolver-binding-linux-riscv64-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+351 silly placeDep ROOT @unrs/resolver-binding-linux-riscv64-musl@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+352 silly placeDep ROOT @unrs/resolver-binding-linux-s390x-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+353 silly placeDep ROOT @unrs/resolver-binding-linux-x64-gnu@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+354 silly placeDep ROOT @unrs/resolver-binding-linux-x64-musl@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+355 silly placeDep ROOT @unrs/resolver-binding-openharmony-arm64@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+356 silly placeDep ROOT @unrs/resolver-binding-wasm32-wasi@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+357 silly placeDep ROOT @unrs/resolver-binding-win32-arm64-msvc@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+358 silly placeDep ROOT @unrs/resolver-binding-win32-ia32-msvc@1.12.2 OK for: unrs-resolver@1.12.2 want: 1.12.2
+359 silly fetch manifest @napi-rs/wasm-runtime@^1.1.4
+360 silly packumentCache full:https://registry.npmjs.org/@napi-rs%2fwasm-runtime cache-miss
+361 silly fetch manifest @emnapi/core@1.10.0
+362 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore cache-miss
+363 silly fetch manifest @emnapi/runtime@1.10.0
+364 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fruntime cache-hit
+365 http cache https://registry.npmjs.org/@emnapi%2fcore 4ms (cache hit)
+366 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fcore set size:117071 disposed:false
+367 http cache https://registry.npmjs.org/@napi-rs%2fwasm-runtime 6ms (cache hit)
+368 silly packumentCache full:https://registry.npmjs.org/@napi-rs%2fwasm-runtime set size:76486 disposed:false
+369 silly placeDep ROOT @emnapi/core@1.10.0 OK for: @unrs/resolver-binding-wasm32-wasi@1.12.2 want: 1.10.0
+370 silly placeDep node_modules/@unrs/resolver-binding-wasm32-wasi @emnapi/runtime@1.10.0 OK for: @unrs/resolver-binding-wasm32-wasi@1.12.2 want: 1.10.0
+371 silly placeDep ROOT @napi-rs/wasm-runtime@1.1.6 OK for: @unrs/resolver-binding-wasm32-wasi@1.12.2 want: ^1.1.4
+372 silly fetch manifest @emnapi/wasi-threads@1.2.1
+373 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads cache-miss
+374 silly fetch manifest @tybys/wasm-util@^0.10.3
+375 silly packumentCache full:https://registry.npmjs.org/@tybys%2fwasm-util cache-miss
+376 http cache https://registry.npmjs.org/@tybys%2fwasm-util 4ms (cache hit)
+377 silly packumentCache full:https://registry.npmjs.org/@tybys%2fwasm-util set size:60108 disposed:false
+378 http cache https://registry.npmjs.org/@emnapi%2fwasi-threads 6ms (cache hit)
+379 silly packumentCache full:https://registry.npmjs.org/@emnapi%2fwasi-threads set size:28580 disposed:false
+380 silly placeDep ROOT @emnapi/wasi-threads@1.2.1 OK for: @emnapi/core@1.10.0 want: 1.2.1
+381 silly placeDep ROOT @tybys/wasm-util@0.10.3 OK for: @napi-rs/wasm-runtime@1.1.6 want: ^0.10.3
+382 silly reify mark retired [
+382 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\@img\\sharp-win32-x64'
+382 silly reify ]
+383 silly reify mark retired [
+383 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\acorn',
+383 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn',
+383 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn.cmd',
+383 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn.ps1'
+383 silly reify ]
+384 silly reify mark retired [
+384 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint',
+384 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint',
+384 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint.cmd',
+384 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint.ps1'
+384 silly reify ]
+385 silly reify mark retired [
+385 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\semver',
+385 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver',
+385 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver.cmd',
+385 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver.ps1'
+385 silly reify ]
+386 silly reify mark retired [
+386 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\semver',
+386 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver',
+386 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver.cmd',
+386 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver.ps1'
+386 silly reify ]
+387 silly reify mark retired [
+387 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\jiti',
+387 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti',
+387 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti.cmd',
+387 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti.ps1'
+387 silly reify ]
+388 silly reify mark retired [
+388 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\js-yaml',
+388 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml',
+388 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml.cmd',
+388 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml.ps1'
+388 silly reify ]
+389 silly reify mark retired [
+389 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\json5',
+389 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5',
+389 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5.cmd',
+389 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5.ps1'
+389 silly reify ]
+390 silly reify mark retired [
+390 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\loose-envify',
+390 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify',
+390 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify.cmd',
+390 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify.ps1'
+390 silly reify ]
+391 silly reify mark retired [
+391 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\napi-postinstall',
+391 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall',
+391 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall.cmd',
+391 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall.ps1'
+391 silly reify ]
+392 silly reify mark retired [
+392 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\next',
+392 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next',
+392 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next.cmd',
+392 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next.ps1'
+392 silly reify ]
+393 silly reify mark retired [
+393 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\semver',
+393 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver',
+393 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver.cmd',
+393 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver.ps1'
+393 silly reify ]
+394 silly reify mark retired [
+394 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\nanoid',
+394 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid',
+394 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid.cmd',
+394 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid.ps1'
+394 silly reify ]
+395 silly reify mark retired [
+395 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\resolve',
+395 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve',
+395 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve.cmd',
+395 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve.ps1'
+395 silly reify ]
+396 silly reify mark retired [
+396 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\semver',
+396 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver',
+396 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver.cmd',
+396 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver.ps1'
+396 silly reify ]
+397 silly reify mark retired [
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\typescript',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc.cmd',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc.ps1',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver.cmd',
+397 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver.ps1'
+397 silly reify ]
+398 silly reify mark retired [
+398 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\which',
+398 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which',
+398 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which.cmd',
+398 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which.ps1'
+398 silly reify ]
+399 silly reify moves {
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\@img\\sharp-win32-x64': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\@img\\.sharp-win32-x64-jsLfpkbO',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\acorn': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.acorn-lVVyIdt9',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.acorn-QKv7ma05',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.acorn.cmd-GKh4wrk5',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\acorn.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.acorn.ps1-NTnoGSzg',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.eslint-UxJMSk1J',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.eslint-27DPHxHU',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.eslint.cmd-6sunXqDY',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\eslint.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.eslint.ps1-cDFWEIsB',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.semver-bkQYwi7o',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\.semver-lOJBprPu',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\.semver.cmd-DyFmBApv',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-import\\node_modules\\.bin\\.semver.ps1-TZVWl1Vq',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.semver-H1qWFtmJ',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\.semver-WLysPRbS',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\.semver.cmd-lMCNMxCi',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\eslint-plugin-react\\node_modules\\.bin\\.semver.ps1-Hi0kE5FI',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\jiti': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.jiti-Z5G5uAHl',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.jiti-vBvT01Ru',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.jiti.cmd-jb6tPMd2',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\jiti.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.jiti.ps1-TRajaWdj',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\js-yaml': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.js-yaml-s1JBhvZv',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.js-yaml-fuH2lRFk',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.js-yaml.cmd-yZfDWRNz',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\js-yaml.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.js-yaml.ps1-NVN41XJI',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\json5': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.json5-h9V4i7HM',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.json5-UJER17uI',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.json5.cmd-7DiJxXkw',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\json5.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.json5.ps1-OD12wqX2',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\loose-envify': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.loose-envify-LW0uKnB4',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.loose-envify-bqQjZIpY',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.loose-envify.cmd-NRtxBU86',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\loose-envify.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.loose-envify.ps1-nGHUhNRX',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\napi-postinstall': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.napi-postinstall-p4TMsEhA',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.napi-postinstall-f2Xi7K0e',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.napi-postinstall.cmd-ml3O0VL0',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\napi-postinstall.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.napi-postinstall.ps1-j3fJiuZO',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\next': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.next-tvKv0fHW',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.next-FjEYs8p7',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.next.cmd-DlmrzlwY',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\next.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.next.ps1-VZuhSjfF',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.semver-jxyFL0qU',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\.semver-EP3J5Maq',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\.semver.cmd-WqenCMGz',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\node-exports-info\\node_modules\\.bin\\.semver.ps1-FNZEZqUZ',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\nanoid': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.nanoid-XAsroymT',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.nanoid-FWnjfXfG',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.nanoid.cmd-aHxFi2u8',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\nanoid.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.nanoid.ps1-1xzwvz0Y',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\resolve': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.resolve-ZnjdBGf0',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.resolve-v0MNdj2X',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.resolve.cmd-NW3jWCYQ',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\resolve.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.resolve.ps1-12M3jpF8',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.semver-uRkrtgL7',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.semver-Bz9EQcyv',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.semver.cmd-BXbj771b',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.semver.ps1-gbFP8Ze2',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\typescript': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.typescript-pKMLpRER',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsc-BFNlnMmF',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsc.cmd-ZJIfAcjL',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsc.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsc.ps1-PxkCPeIf',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsserver-EvvtDtIF',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsserver.cmd-We6QNd09',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\tsserver.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.tsserver.ps1-KJiaeGqQ',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\which': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.which-wwGKYA1n',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.node-which-FLs2dGWI',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which.cmd': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.node-which.cmd-mfsY1FpC',
+399 silly reify   'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\node-which.ps1': 'C:\\Users\\34026\\Desktop\\基于 AI 的在线像素画创作与编辑平台\\node_modules\\.bin\\.node-which.ps1-svmjeuNV'
+399 silly reify }
+400 silly packumentCache corgi:https://registry.npmjs.org/which cache-miss
+401 silly packumentCache corgi:https://registry.npmjs.org/typescript cache-miss
+402 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+403 silly packumentCache corgi:https://registry.npmjs.org/nanoid cache-miss
+404 silly packumentCache corgi:https://registry.npmjs.org/napi-postinstall cache-miss
+405 silly packumentCache corgi:https://registry.npmjs.org/resolve cache-miss
+406 silly packumentCache corgi:https://registry.npmjs.org/json5 cache-miss
+407 silly packumentCache corgi:https://registry.npmjs.org/loose-envify cache-miss
+408 silly packumentCache corgi:https://registry.npmjs.org/next cache-miss
+409 silly packumentCache corgi:https://registry.npmjs.org/js-yaml cache-miss
+410 silly packumentCache corgi:https://registry.npmjs.org/jiti cache-miss
+411 http cache @img/sharp-win32-x64@https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.33.5.tgz 0ms (cache hit)
+412 silly packumentCache corgi:https://registry.npmjs.org/acorn cache-miss
+413 silly packumentCache corgi:https://registry.npmjs.org/eslint cache-miss
+414 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+415 silly tarball no local data for @img/sharp-win32-x64@https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.33.5.tgz. Extracting by manifest.
+416 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+417 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+418 http cache https://registry.npmjs.org/next 107ms (cache hit)
+419 silly packumentCache corgi:https://registry.npmjs.org/next set size:25364224 disposed:false
+420 http cache https://registry.npmjs.org/next/-/next-15.1.1.tgz 503ms (cache hit)
+421 http fetch GET 200 https://registry.npmjs.org/loose-envify 1059ms (cache miss)
+422 silly packumentCache corgi:https://registry.npmjs.org/loose-envify set size:undefined disposed:false
+423 http cache https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz 10ms (cache hit)
+424 http fetch GET 200 https://registry.npmjs.org/which 1112ms (cache miss)
+425 silly packumentCache corgi:https://registry.npmjs.org/which set size:undefined disposed:false
+426 http cache https://registry.npmjs.org/which/-/which-2.0.2.tgz 5ms (cache hit)
+427 http fetch GET 200 https://registry.npmjs.org/js-yaml 1487ms (cache miss)
+428 silly packumentCache corgi:https://registry.npmjs.org/js-yaml set size:undefined disposed:false
+429 http cache https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.0.tgz 9ms (cache hit)
+430 http fetch GET 200 https://registry.npmjs.org/semver 1529ms (cache miss)
+431 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+432 http cache https://registry.npmjs.org/semver/-/semver-7.8.5.tgz 8ms (cache hit)
+433 http fetch GET 200 https://registry.npmjs.org/semver 1536ms (cache miss)
+434 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+435 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 8ms (cache hit)
+436 http fetch GET 200 https://registry.npmjs.org/semver 1792ms (cache miss)
+437 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+438 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 4ms (cache hit)
+439 http fetch GET 200 https://registry.npmjs.org/json5 2053ms (cache miss)
+440 silly packumentCache corgi:https://registry.npmjs.org/json5 set size:undefined disposed:false
+441 http fetch GET 200 https://registry.npmjs.org/napi-postinstall 2055ms (cache miss)
+442 silly packumentCache corgi:https://registry.npmjs.org/napi-postinstall set size:undefined disposed:false
+443 http cache https://registry.npmjs.org/napi-postinstall/-/napi-postinstall-0.3.4.tgz 7ms (cache hit)
+444 http cache https://registry.npmjs.org/json5/-/json5-1.0.2.tgz 10ms (cache hit)
+445 http fetch GET 200 https://registry.npmjs.org/semver 2234ms (cache miss)
+446 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+447 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 4ms (cache hit)
+448 http fetch GET 200 https://registry.npmjs.org/acorn 2291ms (cache miss)
+449 silly packumentCache corgi:https://registry.npmjs.org/acorn set size:undefined disposed:false
+450 http cache https://registry.npmjs.org/acorn/-/acorn-8.17.0.tgz 6ms (cache hit)
+451 http fetch GET 200 https://registry.npmjs.org/nanoid 2502ms (cache miss)
+452 silly packumentCache corgi:https://registry.npmjs.org/nanoid set size:undefined disposed:false
+453 http cache https://registry.npmjs.org/nanoid/-/nanoid-3.3.16.tgz 5ms (cache hit)
+454 http fetch GET 200 https://registry.npmjs.org/eslint 2630ms (cache miss)
+455 silly packumentCache corgi:https://registry.npmjs.org/eslint set size:undefined disposed:false
+456 http cache https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz 18ms (cache hit)
+457 http fetch GET 200 https://registry.npmjs.org/jiti 4819ms (cache miss)
+458 silly packumentCache corgi:https://registry.npmjs.org/jiti set size:undefined disposed:false
+459 http cache https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz 13ms (cache hit)
+460 http fetch GET 200 https://registry.npmjs.org/resolve 5188ms (cache miss)
+461 silly packumentCache corgi:https://registry.npmjs.org/resolve set size:undefined disposed:false
+462 http cache https://registry.npmjs.org/resolve/-/resolve-2.0.0-next.7.tgz 5ms (cache hit)
+463 http fetch GET 200 https://registry.npmjs.org/typescript 9933ms (cache miss)
+464 silly packumentCache corgi:https://registry.npmjs.org/typescript set size:undefined disposed:false
+465 http cache https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 92ms (cache hit)
+466 http fetch GET 200 https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.33.5.tgz 12798ms (cache miss)
+467 silly CHANGE node_modules/which
+468 silly CHANGE node_modules/typescript
+469 silly ADD node_modules/sharp/node_modules/@img/sharp-win32-x64
+470 silly CHANGE node_modules/semver
+471 silly CHANGE node_modules/resolve
+472 silly CHANGE node_modules/nanoid
+473 silly CHANGE node_modules/node-exports-info/node_modules/semver
+474 silly CHANGE node_modules/next
+475 silly CHANGE node_modules/napi-postinstall
+476 silly CHANGE node_modules/loose-envify
+477 silly CHANGE node_modules/json5
+478 silly CHANGE node_modules/js-yaml
+479 silly CHANGE node_modules/jiti
+480 silly CHANGE node_modules/eslint-plugin-react/node_modules/semver
+481 silly CHANGE node_modules/eslint-plugin-import/node_modules/semver
+482 silly CHANGE node_modules/eslint
+483 silly CHANGE node_modules/acorn
+484 silly REMOVE node_modules/@img/sharp-win32-x64
+485 verbose cwd C:\Users\34026\Desktop\基于 AI 的在线像素画创作与编辑平台
+486 verbose os Windows_NT 10.0.26100
+487 verbose node v24.16.0
+488 verbose npm  v11.13.0
+489 verbose exit 0
+490 info ok
