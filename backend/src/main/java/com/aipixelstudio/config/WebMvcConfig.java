@@ -6,6 +6,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Path;
+
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtInterceptor jwtInterceptor;
@@ -18,7 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/api/user/login", "/api/user/register", "/error", "/actuator/**");
+                .excludePathPatterns("/api/user/login", "/api/user/register", "/uploads/**", "/error", "/actuator/**");
     }
 
     @Override
@@ -29,5 +31,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .maxAge(3600);
+    }
+
+    /** Serves locally stored uploads so the browser can show uploaded-image previews. */
+    @Override
+    public void addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
+        String uploadPath = Path.of("uploads").toAbsolutePath().normalize().toString().replace("\\", "/");
+        registry.addResourceHandler("/uploads/**").addResourceLocations("file:" + uploadPath + "/");
     }
 }
