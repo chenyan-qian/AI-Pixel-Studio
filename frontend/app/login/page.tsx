@@ -27,7 +27,8 @@ export default function LoginPage() {
       const response = await request.post<never, LoginResponse>("/api/user/login", { username, password });
       if (response.code !== 200 || !response.data?.token) throw new Error(response.msg || "登录失败");
       saveSession(response.data.token, response.data);
-      router.replace("/home");
+      // A successful sign-in returns the user to the landing page; the workspace is opt-in.
+      router.replace("/");
     } catch (caughtError) {
       const responseMessage = (caughtError as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setError(responseMessage || (caughtError instanceof Error ? caughtError.message : "登录失败，请稍后重试"));

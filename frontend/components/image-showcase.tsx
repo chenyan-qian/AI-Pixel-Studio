@@ -59,7 +59,7 @@ function PreviewCard({ pixel }: { pixel?: boolean }) {
 
 export function ImageShowcase() {
   return (
-    <section className="px-5 pb-24 sm:px-8 lg:pb-32" aria-labelledby="showcase-title">
+    <section className="px-5 pb-24 sm:px-8 lg:pb-32" id="showcase" aria-labelledby="showcase-title">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>

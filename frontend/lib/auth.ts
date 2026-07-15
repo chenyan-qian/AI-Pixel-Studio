@@ -14,6 +14,11 @@ export function saveSession(token: string, user: AuthUser) {
 
 export function getToken() { return localStorage.getItem(TOKEN_KEY); }
 
+/** A session is valid for client-side navigation only when both saved values exist. */
+export function isAuthenticated() {
+  return Boolean(getToken() && getUser());
+}
+
 export function getUser(): AuthUser | null {
   const value = localStorage.getItem(USER_KEY);
   if (!value) return null;
