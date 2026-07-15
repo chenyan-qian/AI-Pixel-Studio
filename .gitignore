@@ -1,1 +1,23 @@
-node_modules
+# Java / Maven
+backend/target/
+
+# Next.js / Node.js
+frontend/node_modules/
+frontend/.next/
+frontend/.npm-cache/
+node_modules/
+.next/
+.npm-cache/
+*.tsbuildinfo
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and operating-system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
