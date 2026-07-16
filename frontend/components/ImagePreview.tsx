@@ -13,13 +13,12 @@ interface ImagePreviewProps {
   image: UploadedImage;
 }
 
-/** Formats byte counts into a compact, human-readable file size. */
 function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** Displays the uploaded image and its server-confirmed metadata. */
+/** Displays the selected source image and server-confirmed metadata. */
 export default function ImagePreview({ image }: ImagePreviewProps) {
   return (
     <section aria-labelledby="preview-title">
