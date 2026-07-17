@@ -18,6 +18,7 @@ export default function CanvasBoard() {
   const draftRef = useRef<PixelMatrix | null>(null);
   const draftSoftnessRef = useRef<SoftnessMatrix | null>(null);
   const changedRef = useRef(false);
+  const changedCellsRef = useRef<Array<{ x: number; y: number }>>([]);
   const lastCellRef = useRef("");
   const [zoom, setZoom] = useState(12);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -133,6 +134,16 @@ export default function CanvasBoard() {
       const left = x * cellWidth;
       const top = y * cellHeight;
       const blurRadius = Math.min(cellWidth, cellHeight) * softness / 260;
+      if (blurRadius > 0) {
+        // The filtered fill becomes partially transparent; lay down an opaque base first.
+        context.save();
+        if (color === TRANSPARENT) context.clearRect(left, top, cellWidth, cellHeight);
+        else {
+          context.fillStyle = color;
+          context.fillRect(left, top, cellWidth, cellHeight);
+        }
+        context.restore();
+      }
       // 每个单元读取其创建时保存的柔化值，后续滑杆调整不会影响已有修改。
       context.save();
       if (blurRadius > 0) context.filter = `blur(${blurRadius}px)`;
@@ -160,8 +171,8 @@ export default function CanvasBoard() {
       context.moveTo(0, y);
       context.lineTo(renderWidth, y);
     }
-    context.strokeStyle = "rgba(15, 23, 42, 0.42)";
-    context.lineWidth = Math.max(1, Math.min(cellWidth, cellHeight) * 0.06);
+    context.strokeStyle = "rgba(15, 23, 42, 0.18)";
+    context.lineWidth = Math.max(0.75, Math.min(cellWidth, cellHeight) * 0.035);
     context.stroke();
   }, [displayPixels, displaySoftness, initialPixels, renderHeight, renderWidth, size, sourceImage]);
 
@@ -181,6 +192,7 @@ export default function CanvasBoard() {
     const nextSoftness = paintMatrixSoftness(currentSoftness, x, y, edgeSoftness);
     if (next !== current || nextSoftness !== currentSoftness) {
       changedRef.current = true;
+      changedCellsRef.current.push({ x, y });
       draftRef.current = next;
       draftSoftnessRef.current = nextSoftness;
       setDraftPixels(next);
@@ -209,13 +221,14 @@ export default function CanvasBoard() {
       const next = fillMatrix(pixels, x, y, selectedColor);
       if (next !== pixels) {
         const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => next[rowIndex][columnIndex] !== pixels[rowIndex][columnIndex] ? edgeSoftness : softness));
-        commitPixels(next, nextSoftness);
+        commitPixels(next, nextSoftness, { action: "fill", description: `使用填充工具修改区域颜色为 ${selectedColor}` });
       }
       return;
     }
     event.currentTarget.setPointerCapture(event.pointerId);
     drawingRef.current = true;
     changedRef.current = false;
+    changedCellsRef.current = [];
     draftRef.current = pixels;
     draftSoftnessRef.current = pixelSoftness;
     lastCellRef.current = `${x}:${y}`;
@@ -238,9 +251,19 @@ export default function CanvasBoard() {
   }
 
   function finishStroke() {
-    if (drawingRef.current && changedRef.current && draftRef.current && draftSoftnessRef.current) commitPixels(draftRef.current, draftSoftnessRef.current);
+    if (drawingRef.current && changedRef.current && draftRef.current && draftSoftnessRef.current) {
+      const cells = changedCellsRef.current;
+      const first = cells[0];
+      const action = tool === "eraser" ? "擦除" : "修改";
+      const color = tool === "eraser" ? "透明" : selectedColor;
+      const description = cells.length === 1 && first
+        ? `${action}坐标(${first.x},${first.y})像素颜色为${color}`
+        : `${action}${cells.length}个像素颜色为${color}`;
+      commitPixels(draftRef.current, draftSoftnessRef.current, { action: "pixel_change", description });
+    }
     drawingRef.current = false;
     changedRef.current = false;
+    changedCellsRef.current = [];
     draftRef.current = null;
     draftSoftnessRef.current = null;
     setDraftPixels(null);
