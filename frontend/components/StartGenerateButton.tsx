@@ -6,7 +6,7 @@ interface StartGenerateButtonProps {
   onClick: () => void;
 }
 
-/** Starts grid analysis for the selected source image. */
+/** 开始分析当前选中的原图并生成像素网格。 */
 export default function StartGenerateButton({ disabled, isProcessing = false, onClick }: StartGenerateButtonProps) {
   return (
     <button type="button" disabled={disabled} onClick={onClick} className="inline-flex h-11 w-full items-center justify-center gap-2 bg-violet-500 px-5 text-sm font-medium text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 sm:w-auto">

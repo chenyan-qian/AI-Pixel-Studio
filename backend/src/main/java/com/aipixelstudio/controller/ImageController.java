@@ -18,7 +18,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Set;
 
-/** Receives source images for the pixel-art workflow. */
+/** 接收像素画工作流使用的原图。 */
 @RestController
 @RequestMapping("/api/image")
 public class ImageController {
@@ -26,8 +26,8 @@ public class ImageController {
     private static final Path UPLOAD_DIRECTORY = Path.of("uploads").toAbsolutePath().normalize();
 
     /**
-     * Stores a supported image in the local uploads directory and returns its basic metadata.
-     * The endpoint remains protected by the existing JWT interceptor.
+     * 将支持的图片保存到本地 uploads 目录，并返回基础元数据。
+     * 该接口继续由现有 JWT 拦截器保护。
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<ImageUploadVO> upload(@RequestParam("file") MultipartFile file) {
@@ -52,7 +52,7 @@ public class ImageController {
         }
     }
 
-    /** Reads dimensions with ImageIO for JPG/PNG and a lightweight WebP header parser for WebP files. */
+    /** JPG/PNG 使用 ImageIO 读取尺寸，WebP 使用轻量级文件头解析器读取尺寸。 */
     private ImageDimension readDimension(MultipartFile file, String extension) throws IOException {
         if ("webp".equals(extension)) return readWebpDimension(file.getBytes());
         BufferedImage image = ImageIO.read(file.getInputStream());
@@ -60,7 +60,7 @@ public class ImageController {
         return new ImageDimension(image.getWidth(), image.getHeight());
     }
 
-    /** Extracts dimensions from the VP8, VP8L, or VP8X WebP container header. */
+    /** 从 WebP 容器的 VP8、VP8L 或 VP8X 文件头中提取尺寸。 */
     private ImageDimension readWebpDimension(byte[] data) {
         if (data.length < 30 || !matches(data, 0, "RIFF") || !matches(data, 8, "WEBP")) {
             throw new IllegalArgumentException("上传的文件不是有效的 WEBP 图片。");
@@ -84,24 +84,24 @@ public class ImageController {
         throw new IllegalArgumentException("无法读取 WEBP 图片尺寸。");
     }
 
-    /** Checks an ASCII signature at the supplied byte offset. */
+    /** 检查指定字节偏移量上的 ASCII 签名。 */
     private boolean matches(byte[] data, int offset, String value) {
         if (data.length < offset + value.length()) return false;
         for (int i = 0; i < value.length(); i++) if (data[offset + i] != (byte) value.charAt(i)) return false;
         return true;
     }
 
-    /** Reads an unsigned 24-bit little-endian number. */
+    /** 读取无符号 24 位小端整数。 */
     private int read24(byte[] data, int offset) {
         return (data[offset] & 0xFF) | ((data[offset + 1] & 0xFF) << 8) | ((data[offset + 2] & 0xFF) << 16);
     }
 
-    /** Returns a lower-case extension without its leading period. */
+    /** 返回不带点号的小写扩展名。 */
     private String getExtension(String fileName) {
         int lastDot = fileName.lastIndexOf('.');
         return lastDot > 0 && lastDot < fileName.length() - 1 ? fileName.substring(lastDot + 1).toLowerCase(Locale.ROOT) : "";
     }
 
-    /** Immutable image width/height pair used internally by the controller. */
+    /** Controller 内部使用的不可变图片宽高数据。 */
     private record ImageDimension(int width, int height) { }
 }

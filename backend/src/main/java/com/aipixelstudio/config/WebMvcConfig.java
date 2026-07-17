@@ -33,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    /** Serves locally stored uploads so the browser can show uploaded-image previews. */
+    /** 映射本地上传目录，供浏览器访问图片预览。 */
     @Override
     public void addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
         String uploadPath = Path.of("uploads").toAbsolutePath().normalize().toString().replace("\\", "/");

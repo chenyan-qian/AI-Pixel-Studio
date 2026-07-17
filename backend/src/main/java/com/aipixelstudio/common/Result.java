@@ -1,6 +1,6 @@
 package com.aipixelstudio.common;
 
-/** Standard API response body. */
+/** 统一 API 响应体。 */
 public class Result<T> {
     private Integer code;
     private String msg;

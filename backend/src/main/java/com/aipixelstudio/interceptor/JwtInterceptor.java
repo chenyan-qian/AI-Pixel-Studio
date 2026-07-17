@@ -24,7 +24,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        // CORS preflight requests do not contain a JWT. Let Spring's CORS handler answer them before the actual authenticated request.
+        // CORS 预检请求不包含 JWT，交由 Spring 的 CORS 处理器在实际鉴权请求前响应。
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }

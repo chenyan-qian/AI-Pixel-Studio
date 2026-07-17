@@ -1,6 +1,6 @@
 package com.aipixelstudio.vo;
 
-/** Metadata returned after a source image has been stored successfully. */
+/** 原图保存成功后返回的图片元数据。 */
 public class ImageUploadVO {
     private String fileName;
     private String url;

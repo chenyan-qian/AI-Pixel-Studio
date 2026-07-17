@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/** API endpoint that analyzes an image into an editable pixel grid. */
+/** 将图片分析为可编辑像素网格的接口。 */
 @RestController
 @RequestMapping("/api/pixel")
 public class PixelController {
@@ -20,6 +20,9 @@ public class PixelController {
         this.pixelService = pixelService;
     }
 
+    /**
+     * 将上传图片转换为可编辑的像素矩阵；接口只返回 JSON，不生成处理后的图片文件。
+     */
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<PixelResultDTO> analyze(@RequestParam("file") MultipartFile file,
                                           @RequestParam("pixelSize") int pixelSize) {

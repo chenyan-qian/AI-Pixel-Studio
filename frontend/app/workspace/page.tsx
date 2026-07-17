@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImagePreview, { type UploadedImage } from "@/components/ImagePreview";
-import PixelCanvas, { type PixelCell } from "@/components/PixelCanvas";
 import PixelSizeSelector, { type PixelSize } from "@/components/PixelSizeSelector";
 import StartGenerateButton from "@/components/StartGenerateButton";
 import UploadArea from "@/components/UploadArea";
 import { Navbar } from "@/components/navbar";
 import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
+import { type PixelCell, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 
 interface UploadResponse {
@@ -33,14 +33,13 @@ function getUploadUrl(url: string) {
   return `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"}${url}`;
 }
 
-/** Authenticated workspace for image upload, grid analysis, and pixel-level colour edits. */
+/** 需要登录的工作台，负责图片上传、网格分析和像素级颜色编辑。 */
 export default function WorkspacePage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [originalImage, setOriginalImage] = useState<UploadedImage | null>(null);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
-  const [pixelGrid, setPixelGrid] = useState<PixelGrid | null>(null);
   const [pixelSize, setPixelSize] = useState<PixelSize>(64);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -59,13 +58,14 @@ export default function WorkspacePage() {
   }, [router]);
 
   useEffect(() => () => {
+    // 更换图片或离开工作台时释放浏览器创建的本地预览 URL。
     if (originalImage?.previewUrl) URL.revokeObjectURL(originalImage.previewUrl);
   }, [originalImage]);
 
   const handleFileSelected = useCallback(async (file: File) => {
+    // 新图片会使现有矩阵和局部编辑失效，因此先清空旧结果。
     setUploadError("");
     setProcessError("");
-    setPixelGrid(null);
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -91,15 +91,15 @@ export default function WorkspacePage() {
   }, []);
 
   function handlePixelSizeChange(size: PixelSize) {
+    // 网格规格变化后必须重新按原图区域映射生成矩阵。
     setPixelSize(size);
-    setPixelGrid(null);
   }
 
   async function handleStartGenerate() {
-    if (!sourceFile) return;
+    if (!sourceFile || !originalImage) return;
     setProcessError("");
-    setPixelGrid(null);
     setProcessing(true);
+    // 分析接口直接接收当前原始文件与目标网格规格。
     const formData = new FormData();
     formData.append("file", sourceFile);
     formData.append("pixelSize", String(pixelSize));
@@ -107,20 +107,20 @@ export default function WorkspacePage() {
     try {
       const response = await request.post<FormData, PixelAnalyzeResponse>("/api/pixel/analyze", formData, { headers: { "Content-Type": "multipart/form-data" } });
       if (response.code !== 200 || !response.data?.pixels) throw new Error(response.msg || "像素网格生成失败，请稍后重试。");
-      setPixelGrid(response.data);
+      // 矩阵写入全局编辑器状态后跳转，编辑页不再依赖图片文件或处理结果图片。
+      // 使用服务端图片地址而非本地 Blob URL，页面跳转后底图仍可正常加载。
+      usePixelEditorStore.getState().initialize(response.data.size, response.data.pixels, {
+        url: originalImage.uploadedUrl,
+        width: originalImage.width,
+        height: originalImage.height,
+      });
+      router.push("/editor");
     } catch (error) {
       const responseMessage = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setProcessError(responseMessage || (error instanceof Error ? error.message : "像素网格生成失败，请稍后重试。"));
     } finally {
       setProcessing(false);
     }
-  }
-
-  function handlePixelColorChange(x: number, y: number, color: string) {
-    setPixelGrid((currentGrid) => currentGrid && {
-      ...currentGrid,
-      pixels: currentGrid.pixels.map((pixel) => pixel.x === x && pixel.y === y ? { ...pixel, color } : pixel),
-    });
   }
 
   if (!checkedAuth || !user) return <main className="grid min-h-screen place-items-center bg-[#08090d] text-sm text-zinc-500">正在验证登录状态...</main>;
@@ -144,7 +144,6 @@ export default function WorkspacePage() {
               <StartGenerateButton disabled={!sourceFile || processing} isProcessing={processing} onClick={handleStartGenerate} />
               {processError && <p className="mt-4 border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-200" role="alert">{processError}</p>}
             </div>
-            {pixelGrid && <PixelCanvas size={pixelGrid.size} pixels={pixelGrid.pixels} sourceImageUrl={originalImage.previewUrl || originalImage.uploadedUrl} sourceWidth={originalImage.width} sourceHeight={originalImage.height} onPixelColorChange={handlePixelColorChange} />}
           </div>}
         </div>
       </section>
