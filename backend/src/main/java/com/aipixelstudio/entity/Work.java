@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.LocalDateTime;
 
+/** 像素作品当前持久化后的主状态，与历史操作记录分开保存。 */
 @TableName("work")
 public class Work {
     @TableId(type = IdType.AUTO)

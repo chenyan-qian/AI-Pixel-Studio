@@ -18,7 +18,7 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** Displays the selected source image and server-confirmed metadata. */
+/** 展示已选择的原图以及服务端确认后的图片元数据。 */
 export default function ImagePreview({ image }: ImagePreviewProps) {
   return (
     <section aria-labelledby="preview-title">

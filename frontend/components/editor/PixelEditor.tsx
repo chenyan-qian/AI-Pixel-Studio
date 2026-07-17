@@ -8,7 +8,7 @@ import ColorPicker from "@/components/editor/ColorPicker";
 import HistoryPanel from "@/components/editor/HistoryPanel";
 import Palette from "@/components/editor/Palette";
 import ToolBar from "@/components/editor/ToolBar";
-import { downloadImage, exportPixelMatrix } from "@/lib/pixel-export";
+import { downloadImage, exportPixelImage } from "@/lib/pixel-export";
 import { TRANSPARENT, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 
@@ -23,24 +23,42 @@ function toRgbText(color: string) {
 /** 参考 Piskel 布局的像素编辑工作台。 */
 export default function PixelEditor() {
   const pixels = usePixelEditorStore((state) => state.pixels);
+  const initialPixels = usePixelEditorStore((state) => state.initialPixels);
+  const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
   const size = usePixelEditorStore((state) => state.size);
+  const sourceImageUrl = usePixelEditorStore((state) => state.sourceImageUrl);
+  const sourceWidth = usePixelEditorStore((state) => state.sourceWidth);
+  const sourceHeight = usePixelEditorStore((state) => state.sourceHeight);
   const hoveredPixel = usePixelEditorStore((state) => state.hoveredPixel);
   const history = usePixelEditorStore((state) => state.history);
   const workId = usePixelEditorStore((state) => state.workId);
   const setWorkId = usePixelEditorStore((state) => state.setWorkId);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
 
-  function exportImage(format: "png" | "jpg") {
+  async function exportImage(format: "png" | "jpg") {
+    if (exporting) return;
+    setExporting(true);
+    setSaveMessage("");
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
-    downloadImage(exportPixelMatrix(pixels, size, mimeType), format);
+    try {
+      const dataUrl = await exportPixelImage({ pixels, initialPixels, pixelSoftness, size, sourceImageUrl, sourceWidth, sourceHeight, mimeType });
+      downloadImage(dataUrl, format);
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "导出失败，请稍后重试。");
+    } finally {
+      setExporting(false);
+    }
   }
 
   async function saveWork() {
     setSaving(true);
     setSaveMessage("");
+    // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
     const payload = { title: "未命名像素作品", size, pixelData: pixels, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, compressedSnapshot: record.compressedSnapshot })) };
     try {
+      // 第一次保存会创建作品，之后继续保存会更新同一条作品记录。
       const response = workId
         ? await request.put<typeof payload, SaveWorkResponse>(`/api/works/${workId}`, payload)
         : await request.post<typeof payload, SaveWorkResponse>("/api/works", payload);
@@ -57,7 +75,7 @@ export default function PixelEditor() {
     <main className="flex min-h-screen flex-col bg-[#08090d] text-zinc-100">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.1] bg-[#101119] px-4">
         <div className="flex items-center gap-4"><Link href="/workspace" className="text-sm font-semibold text-white">AI Pixel Studio</Link><span className="border-l border-white/[0.12] pl-4 text-xs text-zinc-500">{size} × {size} 像素编辑器</span></div>
-        <div className="flex items-center gap-2"><button type="button" onClick={saveWork} disabled={saving} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button><button type="button" onClick={() => exportImage("png")} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400"><Download className="size-3.5" />PNG</button><button type="button" onClick={() => exportImage("jpg")} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400"><ImageDown className="size-3.5" />JPG</button></div>
+        <div className="flex items-center gap-2"><button type="button" onClick={saveWork} disabled={saving} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button><button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
       </header>
       <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[58px_minmax(0,1fr)_280px] lg:grid-rows-1">
         <ToolBar />

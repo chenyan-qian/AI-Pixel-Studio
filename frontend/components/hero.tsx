@@ -7,7 +7,7 @@ import { getToken, getUser } from "@/lib/auth";
 export function Hero() {
   const router = useRouter();
 
-  /** Guests sign in first; signed-in users can immediately start creating. */
+  /** 未登录用户先进入登录页，已登录用户可直接开始创作。 */
   function openWorkspace() {
     router.push(getToken() && getUser() ? "/workspace" : "/login");
   }

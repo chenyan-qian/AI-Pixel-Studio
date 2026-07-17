@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Keeps legacy bookmarks working while the workspace uses its new public route. */
+/** 兼容旧书签入口，当前工作台已切换到新的公开访问路径。 */
 export default function LegacyHomePage() {
   redirect("/workspace");
 }

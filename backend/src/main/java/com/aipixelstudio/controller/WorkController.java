@@ -22,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/works")
+/** 作品接口统一从 JWT 中识别用户归属，不接受前端直接传 userId。 */
 public class WorkController {
     private final WorkService workService;
     private final JwtUtil jwtUtil;
@@ -52,6 +53,7 @@ public class WorkController {
     }
 
     private Long currentUserId(HttpServletRequest request) {
+        // 请求进入当前控制器前，JwtInterceptor 已完成请求头校验。
         String token = request.getHeader("Authorization").substring(7);
         Claims claims = jwtUtil.parseToken(token);
         return Long.valueOf(claims.getSubject());

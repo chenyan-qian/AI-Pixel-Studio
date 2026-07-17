@@ -7,7 +7,7 @@ interface PixelSizeSelectorProps {
 
 const PIXEL_SIZES: PixelSize[] = [32, 64, 128, 256];
 
-/** Controlled radio group for selecting one target pixel-art resolution. */
+/** 受控单选组，用于选择目标像素画分辨率。 */
 export default function PixelSizeSelector({ value, onChange }: PixelSizeSelectorProps) {
   return (
     <fieldset>

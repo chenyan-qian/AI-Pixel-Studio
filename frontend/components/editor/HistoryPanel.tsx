@@ -15,6 +15,7 @@ export default function HistoryPanel() {
   const goToHistory = usePixelEditorStore((state) => state.goToHistory);
 
   useEffect(() => {
+    // 保留浏览器默认快捷键习惯，同时避免在可编辑输入区域里误拦截。
     function handleShortcut(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
       if (target?.closest("input, textarea, select, [contenteditable='true']") || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "z") return;
@@ -33,6 +34,7 @@ export default function HistoryPanel() {
       <button type="button" title="清空画布" aria-label="清空画布" onClick={clear} className="grid h-8 place-items-center border border-rose-400/30 text-rose-200 hover:bg-rose-400/10"><Trash2 className="size-4" /></button>
     </div>
     <div className="max-h-64 overflow-y-auto border-y border-white/[0.08] py-1" aria-label="历史操作时间线">
+      {/* 记录数组保持原顺序便于按索引恢复，界面展示时再倒序渲染时间线。 */}
       {history.map((record, index) => {
         const isCurrent = index === historyIndex;
         return <button key={record.id} type="button" onClick={() => goToHistory(index)} aria-current={isCurrent ? "step" : undefined} className={`relative flex w-full items-start gap-2 border-l-2 px-2 py-2 text-left transition-colors ${isCurrent ? "border-violet-400 bg-violet-400/10" : "border-white/[0.12] hover:bg-white/[0.05]"}`}>

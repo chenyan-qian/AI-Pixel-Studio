@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
+/** 保存作品时提交的请求体，包含当前画布和当前可见的历史分支。 */
 public class WorkSaveDTO {
     private String title;
     @NotNull private Integer size;

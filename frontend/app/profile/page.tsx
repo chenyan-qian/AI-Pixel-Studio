@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
 
-/** Account display page. Editable fields will be connected once a profile API is available. */
+/** 账户展示页，后续接入资料接口后再开放可编辑能力。 */
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);

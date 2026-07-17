@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.LocalDateTime;
 
+/** 某个用户作品的一条可恢复操作快照。 */
 @TableName("work_history")
 public class WorkHistory {
     @TableId(type = IdType.AUTO)

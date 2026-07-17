@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export const TRANSPARENT = "transparent";
+/** 最近保留完整矩阵快照、可直接恢复的历史记录数量。 */
 export const FULL_SNAPSHOT_LIMIT = 20;
 export type EditorTool = "pencil" | "eraser" | "fill" | "eyedropper";
 export type PixelMatrix = string[][];
@@ -16,6 +17,7 @@ export interface HistoryRecord {
   action: HistoryAction;
   description: string;
   timestamp: string;
+  /** 新近记录直接保留矩阵数据，更早的记录只保留压缩快照。 */
   pixelData?: PixelMatrix;
   softnessData?: SoftnessMatrix;
   compressedSnapshot?: string;
@@ -59,7 +61,7 @@ function createTransparentMatrix(size: number): PixelMatrix { return Array.from(
 function createSoftnessMatrix(size: number, value = 0): SoftnessMatrix { return Array.from({ length: size }, () => Array.from({ length: size }, () => value)); }
 function now() { return new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }); }
 
-/** Run-length encoding keeps older canvas snapshots restorable without retaining matrix objects. */
+/** 用行程编码压缩旧快照，避免一直保留完整矩阵对象。 */
 function compressSnapshot(snapshot: PixelSnapshot) {
   const values = snapshot.pixels.flat().map((color, index) => `${color}|${snapshot.softness.flat()[index] ?? 0}`);
   const encoded: Array<[string, number]> = [];
@@ -86,12 +88,14 @@ function decompressSnapshot(value: string): PixelSnapshot {
   return { pixels, softness };
 }
 
+/** 统一恢复最近的完整快照或较早的压缩快照。 */
 function materialize(record: HistoryRecord): PixelSnapshot {
   if (record.pixelData && record.softnessData) return { pixels: record.pixelData, softness: record.softnessData };
   if (record.compressedSnapshot) return decompressSnapshot(record.compressedSnapshot);
   throw new Error("历史记录快照不完整");
 }
 
+/** 仅将最近 20 步之外的历史记录压缩为 RLE 快照。 */
 function compact(records: HistoryRecord[]) {
   const firstFullIndex = Math.max(0, records.length - FULL_SNAPSHOT_LIMIT);
   return records.map((record, index) => {
@@ -119,7 +123,7 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
   addPaletteColor: (color) => { const nextColor = (color || get().selectedColor).toUpperCase(); set((state) => state.palette.includes(nextColor) ? state : { palette: [...state.palette, nextColor] }); },
   setHoveredPixel: (hoveredPixel) => set({ hoveredPixel }),
   commitPixels: (pixels, pixelSoftness, commit) => set((state) => {
-    // Editing after a rollback replaces the abandoned forward branch.
+    // 回退后继续编辑时，丢弃旧的前进分支，只保留当前活动分支。
     const activeRecords = state.history.slice(0, state.historyIndex + 1);
     const nextId = Math.max(0, ...activeRecords.map((record) => record.id)) + 1;
     const next: HistoryRecord = { id: nextId, action: commit.action, description: commit.description, timestamp: now(), pixelData: cloneMatrix(pixels), softnessData: cloneSoftnessMatrix(pixelSoftness) };
@@ -131,6 +135,7 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
     const snapshot = materialize(state.history[historyIndex]);
     return { pixels: cloneMatrix(snapshot.pixels), pixelSoftness: cloneSoftnessMatrix(snapshot.softness), historyIndex };
   }),
+  // 撤销和重做与点击历史记录面板时走同一套恢复逻辑。
   undo: () => { const { historyIndex, goToHistory } = get(); if (historyIndex > 0) goToHistory(historyIndex - 1); },
   redo: () => { const { historyIndex, history, goToHistory } = get(); if (historyIndex < history.length - 1) goToHistory(historyIndex + 1); },
   clear: () => { const { size, edgeSoftness } = get(); get().commitPixels(createTransparentMatrix(size), createSoftnessMatrix(size, edgeSoftness), { action: "clear", description: "清空画布" }); },

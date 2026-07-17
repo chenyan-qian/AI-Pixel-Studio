@@ -23,7 +23,7 @@ export function Navbar() {
     setUser(getToken() ? getUser() : null);
   }, [pathname]);
 
-  /** Clears every locally saved credential before returning to the public landing page. */
+  /** 清除本地保存的登录凭证，并返回公开首页。 */
   function logout() {
     clearSession();
     setUser(null);

@@ -10,7 +10,7 @@ interface UploadAreaProps {
   onFileSelected: (file: File) => void;
 }
 
-/** Drag-and-drop image picker that validates the supported source formats. */
+/** 支持拖拽上传的图片选择区，并校验允许的源文件格式。 */
 export default function UploadArea({ isUploading, onFileSelected }: UploadAreaProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);

@@ -14,7 +14,7 @@ export function saveSession(token: string, user: AuthUser) {
 
 export function getToken() { return localStorage.getItem(TOKEN_KEY); }
 
-/** A session is valid for client-side navigation only when both saved values exist. */
+/** 只有本地同时存在 token 和用户信息时，才视为前端登录态有效。 */
 export function isAuthenticated() {
   return Boolean(getToken() && getUser());
 }

@@ -2,6 +2,7 @@ package com.aipixelstudio.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/** 前端提交的单条活动历史节点数据结构。 */
 public class HistoryRecordSaveDTO {
     private Integer id;
     private String operationType;

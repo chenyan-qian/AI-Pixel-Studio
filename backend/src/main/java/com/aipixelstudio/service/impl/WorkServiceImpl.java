@@ -22,6 +22,7 @@ import java.util.List;
 
 @Service
 public class WorkServiceImpl implements WorkService {
+    /** 即使前端绕过快照压缩策略，也限制一次保存可携带的历史记录数量。 */
     private static final int MAX_HISTORY_RECORDS = 500;
     private final WorkMapper workMapper;
     private final WorkHistoryMapper workHistoryMapper;
@@ -38,6 +39,7 @@ public class WorkServiceImpl implements WorkService {
     public WorkSaveVO save(Long userId, Long workId, WorkSaveDTO request) {
         validate(request);
         Work work;
+        // 只有当前登录用户自己的作品，才允许按指定 id 覆盖保存。
         if (workId == null) {
             work = new Work();
             work.setUserId(userId);
@@ -51,7 +53,7 @@ public class WorkServiceImpl implements WorkService {
         work.setUpdateTime(LocalDateTime.now());
         if (work.getId() == null) workMapper.insert(work); else workMapper.updateById(work);
 
-        // The client sends only the active branch. Replacing rows hides abandoned branches atomically.
+        // 前端只提交当前活动分支，直接整批替换可一次性隐藏已废弃的旧分支。
         workHistoryMapper.delete(Wrappers.<WorkHistory>lambdaQuery().eq(WorkHistory::getWorkId, work.getId()).eq(WorkHistory::getUserId, userId));
         for (HistoryRecordSaveDTO record : request.getHistory()) {
             WorkHistory history = new WorkHistory();
@@ -103,6 +105,7 @@ public class WorkServiceImpl implements WorkService {
     }
 
     private LocalDateTime operationDateTime(String operationTime) {
+        // 前端只传时分秒，这里补上当天日期后再写入数据库。
         if (operationTime == null || operationTime.isBlank()) return LocalDateTime.now();
         try { return LocalDateTime.now().with(LocalTime.parse(operationTime, DateTimeFormatter.ofPattern("HH:mm:ss"))); }
         catch (RuntimeException exception) { return LocalDateTime.now(); }

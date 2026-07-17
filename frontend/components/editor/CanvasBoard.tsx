@@ -135,7 +135,7 @@ export default function CanvasBoard() {
       const top = y * cellHeight;
       const blurRadius = Math.min(cellWidth, cellHeight) * softness / 260;
       if (blurRadius > 0) {
-        // The filtered fill becomes partially transparent; lay down an opaque base first.
+        // 模糊后的填充会带一点透明度，先铺一层不透明底色，避免露出原图。
         context.save();
         if (color === TRANSPARENT) context.clearRect(left, top, cellWidth, cellHeight);
         else {
