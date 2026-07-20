@@ -1,80 +1,29 @@
-import { ArrowRight, Check, WandSparkles } from "lucide-react";
+import { Heart, Sparkles } from "lucide-react";
 
-function OriginalArtwork() {
-  return (
-    <div className="relative h-full overflow-hidden bg-[#7db0c5]" aria-label="原始风景图片示例">
-      <div className="absolute inset-x-0 top-0 h-3/5 bg-[linear-gradient(180deg,#9ec7d1_0%,#d8d3c2_100%)]" />
-      <div className="absolute left-[13%] top-[16%] size-[18%] rounded-full bg-[#f4d7a4] opacity-90" />
-      <div className="absolute inset-x-0 bottom-[26%] h-[38%] bg-[#678e86] [clip-path:polygon(0_70%,18%_34%,31%_67%,51%_12%,69%_66%,82%_35%,100%_72%,100%_100%,0_100%)]" />
-      <div className="absolute inset-x-0 bottom-[15%] h-[35%] bg-[#355f67] [clip-path:polygon(0_70%,14%_37%,29%_71%,48%_20%,61%_62%,75%_35%,100%_73%,100%_100%,0_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-[31%] bg-[linear-gradient(160deg,#254d56_0%,#1e344b_72%)]" />
-      <div className="absolute bottom-[13%] left-[25%] h-[33%] w-[2px] rotate-[-25deg] bg-[#172b3c]" />
-      <div className="absolute bottom-[22%] left-[20%] h-[2px] w-[14%] rotate-[-28deg] bg-[#172b3c]" />
-      <div className="absolute bottom-[22%] left-[29%] h-[2px] w-[14%] rotate-[24deg] bg-[#172b3c]" />
-      <div className="absolute bottom-[13%] right-[23%] h-[40%] w-[2px] rotate-[24deg] bg-[#172b3c]" />
-      <div className="absolute bottom-[25%] right-[18%] h-[2px] w-[15%] rotate-[28deg] bg-[#172b3c]" />
-      <div className="absolute bottom-[25%] right-[27%] h-[2px] w-[15%] rotate-[-23deg] bg-[#172b3c]" />
-    </div>
-  );
-}
+const palettes = [
+  ["#191d4a", "#3844a3", "#77c8ff", "#f4d06f", "#f38ba8", "#6b5ce7", "#1f285b", "#55e1c4", "#dbf4ff", "#ed8ccb", "#394eb7", "#121530", "#49a7d8", "#f5ad65", "#5140b6", "#24316c"],
+  ["#121b38", "#284a8d", "#5be7c4", "#a7f3d0", "#d7fffb", "#2c2c79", "#7d55d3", "#f0a9e2", "#1a2b5b", "#2d75b8", "#6de4ff", "#c1b8ff", "#4a3388", "#f5ce76", "#69d5aa", "#192349"],
+  ["#21194a", "#684bc4", "#b486f7", "#f7b1d1", "#fdde90", "#6bdbdd", "#1b315e", "#3c69b7", "#ed87b0", "#ffc76b", "#6b5ad3", "#312263", "#90f2e4", "#c8d4ff", "#5741a0", "#1a1738"],
+  ["#132241", "#285993", "#4aa9c5", "#91dfd0", "#f7d878", "#f28c8c", "#4f428f", "#272558", "#1e4076", "#4989b9", "#75ddd5", "#b5f5e7", "#efd16a", "#a765c7", "#5347aa", "#14213d"],
+];
 
-function PixelArt() {
-  const rows = [
-    ["#1a1732", "#1a1732", "#363265", "#363265", "#7568ad", "#1a1732", "#1a1732", "#252143"],
-    ["#1a1732", "#4d4784", "#7467af", "#a48ddd", "#bfb1ef", "#7467af", "#403979", "#252143"],
-    ["#4b447d", "#8d77c9", "#c8b4ef", "#e8d9f8", "#eddff9", "#bfafe8", "#715cb3", "#39336a"],
-    ["#695baa", "#ad91d7", "#d9c1ef", "#ffe4d2", "#ffe0b9", "#d8c1ef", "#9a7ecc", "#5c4c9d"],
-    ["#3f3977", "#7e6abe", "#d2bbe8", "#fbd9c6", "#f9d2a8", "#c4b1e2", "#7d66b5", "#39346c"],
-    ["#1b3460", "#345690", "#5d86bb", "#82a6d2", "#90b5d5", "#5e80b1", "#3c5b92", "#202e55"],
-    ["#173458", "#275a86", "#3e7b9b", "#65a0af", "#5d9da7", "#39768d", "#285678", "#1a3155"],
-    ["#11294a", "#194665", "#28647a", "#418584", "#498b7e", "#2e6474", "#1d4765", "#152b4c"],
-  ];
+const works = [
+  { title: "Moonlit Signal", author: "Mira", likes: "2.4k", palette: palettes[0], label: "热门像素作品" },
+  { title: "Tide Pool", author: "Kiro", likes: "1.8k", palette: palettes[1], label: "热门像素作品" },
+  { title: "Sunset Terminal", author: "Aster", likes: "826", palette: palettes[2], label: "最新创作" },
+  { title: "Little Voyager", author: "Yun", likes: "594", palette: palettes[3], label: "最新创作" },
+];
 
-  return (
-    <div className="grid h-full w-full grid-cols-8 overflow-hidden bg-[#16213e]" aria-label="AI 生成的像素画示例">
-      {rows.flat().map((color, index) => <span className="aspect-square" key={`${color}-${index}`} style={{ backgroundColor: color }} />)}
-    </div>
-  );
-}
-
-function PreviewCard({ pixel }: { pixel?: boolean }) {
-  return (
-    <div className="overflow-hidden border border-white/[0.1] bg-[#11131b] shadow-2xl shadow-black/25">
-      <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-          <span className={`size-2 ${pixel ? "bg-violet-400" : "bg-cyan-400"}`} />
-          {pixel ? "AI 生成的像素画" : "原始图片"}
-        </div>
-        {pixel ? <WandSparkles className="size-4 text-violet-300" /> : <span className="text-xs text-zinc-600">JPG</span>}
-      </div>
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#171b25] p-3">
-        {pixel ? <PixelArt /> : <OriginalArtwork />}
-      </div>
-      <div className="flex items-center gap-2 px-4 py-3 text-xs text-zinc-500">
-        <Check className="size-3.5 text-emerald-400" /> {pixel ? "16 色调色板 · 32 × 32" : "上传图片 · 1920 × 1280"}
-      </div>
-    </div>
-  );
+function PixelArtwork({ palette, title }: { palette: string[]; title: string }) {
+  return <div className="grid aspect-[5/4] grid-cols-4 gap-1 bg-[#0d1020] p-2" aria-label={`${title} 像素作品`}>{palette.map((color, index) => <span key={`${color}-${index}`} className="block min-h-0" style={{ backgroundColor: color }} />)}</div>;
 }
 
 export function ImageShowcase() {
   return (
-    <section className="px-5 pb-24 sm:px-8 lg:pb-32" id="showcase" aria-labelledby="showcase-title">
+    <section className="px-5 py-20 sm:px-8 lg:py-28" id="works" aria-labelledby="showcase-title">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-sm font-medium text-violet-300">从灵感到像素</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-[0.01em] text-white sm:text-3xl" id="showcase-title">一键转换，保留每处细节</h2>
-          </div>
-          <p className="max-w-sm text-sm leading-6 text-zinc-500">智能识别构图与光影，让照片转化为兼具风格与辨识度的像素作品。</p>
-        </div>
-        <div className="grid items-center gap-4 lg:grid-cols-[1fr_72px_1fr] lg:gap-6">
-          <PreviewCard />
-          <div className="relative mx-auto grid size-10 place-items-center border border-violet-300/25 bg-violet-400/[0.08] text-violet-200 lg:size-12">
-            <ArrowRight className="size-5 lg:size-6" />
-          </div>
-          <PreviewCard pixel />
-        </div>
+        <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold tracking-[0.18em] text-violet-300">COMMUNITY GALLERY</p><h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl" id="showcase-title">来自 PixelVerse 的灵感</h2></div><a className="inline-flex items-center gap-2 text-sm text-cyan-200 transition hover:text-white" href="#community">探索创作社区 <Sparkles className="size-4" /></a></div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{works.map((work) => <article className="pixel-corners overflow-hidden border border-white/[0.1] bg-[#16172b] shadow-xl shadow-black/15 transition hover:-translate-y-1 hover:border-violet-300/35" key={work.title}><PixelArtwork palette={work.palette} title={work.title} /><div className="p-4"><span className="text-[11px] text-cyan-200/75">{work.label}</span><h3 className="mt-1 text-sm font-semibold text-white">{work.title}</h3><div className="mt-3 flex items-center justify-between text-xs"><span className="text-zinc-500">by <span className="text-zinc-300">{work.author}</span></span><span className="inline-flex items-center gap-1 text-pink-200"><Heart className="size-3 fill-current" />{work.likes}</span></div></div></article>)}</div>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08090d;
+  --background: #0f0f1a;
 }
 
 * {
@@ -27,10 +27,25 @@ button {
   cursor: pointer;
 }
 
-.grid-background {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
-  background-size: 42px 42px;
+.grid-background, .hero-grid {
+  background-image: linear-gradient(rgba(121, 144, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(121, 144, 255, 0.07) 1px, transparent 1px);
+  background-size: 38px 38px;
 }
+
+.hero-grid {
+  background-color: #0f0f1a;
+  background-image: radial-gradient(circle at 78% 32%, rgba(47, 203, 255, 0.16), transparent 19%), radial-gradient(circle at 20% 8%, rgba(130, 86, 255, 0.2), transparent 23%), linear-gradient(rgba(121, 144, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(121, 144, 255, 0.07) 1px, transparent 1px);
+}
+
+.pixel-corners { clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px)); }
+
+.glow-button { background: linear-gradient(110deg, #6d5dfc, #3d7cff 55%, #23c8de); box-shadow: 0 0 22px rgba(77, 113, 255, 0.32); transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease; }
+.glow-button:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(68, 213, 255, 0.42); filter: brightness(1.08); }
+.pixel-tile { animation: pixelPulse 4s ease-in-out infinite; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.pixel-float { position: absolute; z-index: -1; width: 18px; height: 18px; opacity: .7; animation: drift 10s ease-in-out infinite; }
+.pixel-float-one { top: 21%; left: 10%; background: #7f65ff; box-shadow: 18px 18px #2fc8e4, 36px 0 #f3a4d0; }
+.pixel-float-two { right: 13%; top: 16%; background: #4bd7ff; box-shadow: -24px 20px #7957d8; animation-delay: -4s; }
+.pixel-float-three { bottom: 15%; left: 47%; width: 12px; height: 12px; background: #f3b765; box-shadow: 20px -16px #43ddbd; animation-delay: -7s; }
 
 /* 透明像素在编辑器中显示为常见的棋盘格背景。 */
 .pixel-checker {
@@ -51,6 +66,9 @@ button {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes drift { 50% { transform: translate(14px, -20px) rotate(18deg); } }
+@keyframes pixelPulse { 50% { filter: brightness(1.2); transform: scale(.96); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

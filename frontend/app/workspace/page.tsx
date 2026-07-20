@@ -123,18 +123,20 @@ export default function WorkspacePage() {
     }
   }
 
-  if (!checkedAuth || !user) return <main className="grid min-h-screen place-items-center bg-[#08090d] text-sm text-zinc-500">正在验证登录状态...</main>;
+  if (!checkedAuth || !user) return <main className="grid min-h-screen place-items-center bg-[#0f0f1a] text-sm text-zinc-500">正在验证登录状态...</main>;
 
   return (
-    <main className="grid-background min-h-screen bg-[#08090d] px-5 pb-12 pt-28 text-zinc-100 sm:px-8">
+    <main className="grid-background min-h-screen bg-[#0f0f1a] px-5 pb-16 pt-28 text-zinc-100 sm:px-8">
       <Navbar />
       <section className="mx-auto max-w-6xl py-8 sm:py-12" aria-labelledby="workspace-title">
-        <p className="text-sm text-violet-300">创作工作台</p>
-        <h1 id="workspace-title" className="mt-3 text-3xl font-semibold text-white sm:text-4xl">你好，{user.nickname || user.username}</h1>
-        <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">上传图片并生成可逐格编辑的像素网格。</p>
-        <div className="mt-9 max-w-5xl border border-white/[0.12] bg-[#10111a]/90 p-5 shadow-2xl shadow-black/20 backdrop-blur sm:p-7">
-          <h2 className="text-lg font-semibold text-white">上传图片</h2>
-          <p className="mt-1 text-sm text-zinc-500">像素网格分析支持 JPG、JPEG 和 PNG 格式。</p>
+        <p className="text-sm font-semibold tracking-[0.18em] text-cyan-300">CREATE STUDIO</p>
+        <h1 id="workspace-title" className="mt-3 text-3xl font-bold text-white sm:text-4xl">开始新的像素创作，{user.nickname || user.username}</h1>
+        <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">上传一张图片，选择画布规格，然后进入逐格编辑的像素世界。</p>
+        <div className="mt-9 grid max-w-5xl gap-3 text-xs text-zinc-500 sm:grid-cols-3"><span className="flex items-center gap-2 border-l-2 border-cyan-300 bg-white/[0.03] px-3 py-2"><b className="text-cyan-200">01</b> 上传图片</span><span className="flex items-center gap-2 border-l-2 border-violet-300 bg-white/[0.03] px-3 py-2"><b className="text-violet-200">02</b> 选择规格</span><span className="flex items-center gap-2 border-l-2 border-blue-300 bg-white/[0.03] px-3 py-2"><b className="text-blue-200">03</b> 编辑创作</span></div>
+        <div className="pixel-corners mt-6 max-w-5xl border border-white/[0.12] bg-[#131427]/85 p-5 shadow-2xl shadow-violet-950/20 backdrop-blur sm:p-7">
+          <p className="text-xs font-semibold tracking-[0.16em] text-violet-300">STEP 01</p>
+          <h2 className="mt-2 text-xl font-semibold text-white">创建像素作品</h2>
+          <p className="mt-1 text-sm text-zinc-500">支持 JPG、JPEG、PNG 和 WEBP 格式。</p>
           <UploadArea isUploading={uploading} onFileSelected={handleFileSelected} />
           {uploadError && <p className="mt-4 border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-200" role="alert">{uploadError}</p>}
           {originalImage && <div className="mt-7 space-y-7 border-t border-white/[0.1] pt-7">

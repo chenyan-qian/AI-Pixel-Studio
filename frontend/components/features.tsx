@@ -1,27 +1,21 @@
-import { Download, PencilRuler, Sparkles } from "lucide-react";
+import { Grid3X3, ImageUp, PencilRuler, Share2 } from "lucide-react";
 
-const features = [
-  { icon: Sparkles, title: "AI 智能生成像素画", description: "上传任意图片，快速生成高质量像素风作品。", accent: "text-violet-300", border: "group-hover:border-violet-400/35" },
-  { icon: PencilRuler, title: "在线像素编辑器", description: "支持铅笔、橡皮、颜色选择、图层管理等编辑功能。", accent: "text-sky-300", border: "group-hover:border-sky-400/35" },
-  { icon: Download, title: "多格式导出", description: "支持导出 PNG、GIF、Sprite Sheet 等多种格式，方便游戏开发使用。", accent: "text-fuchsia-300", border: "group-hover:border-fuchsia-400/35" },
+const steps = [
+  { number: "01", icon: ImageUp, title: "上传图片", description: "带入一张照片或草图，开始你的像素旅程。", accent: "text-cyan-200" },
+  { number: "02", icon: Grid3X3, title: "生成像素作品", description: "选择画布规格，转换为可编辑的像素网格。", accent: "text-violet-200" },
+  { number: "03", icon: PencilRuler, title: "自由编辑", description: "逐格调色、绘制细节，让画面拥有你的风格。", accent: "text-blue-200" },
+  { number: "04", icon: Share2, title: "分享作品", description: "将每一份灵感带到 PixelVerse 社区。", accent: "text-fuchsia-200" },
 ];
 
 export function Features() {
   return (
-    <section className="border-y border-white/[0.07] bg-[#0b0c12] px-5 py-24 sm:px-8 lg:py-32" id="作品展示" aria-labelledby="features-title">
+    <section className="relative border-y border-white/[0.07] bg-[#111224]/60 px-5 py-20 sm:px-8 lg:py-28" id="create" aria-labelledby="features-title">
       <div className="mx-auto max-w-6xl">
-        <div className="max-w-xl">
-          <p className="text-sm font-medium text-violet-300">为创作而生</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[0.01em] text-white sm:text-3xl" id="features-title">简单的工具，丰富的表达</h2>
-          <p className="mt-4 text-sm leading-6 text-zinc-500">从图像生成到逐像素微调，把想法转化为可用的游戏与创作资产。</p>
-        </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {features.map(({ icon: Icon, title, description, accent, border }) => (
-            <article className={`group border border-white/[0.09] bg-[#10121a] p-6 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:bg-[#141622] ${border}`} key={title}>
-              <div className={`grid size-10 place-items-center border border-current/20 bg-white/[0.03] ${accent}`}><Icon className="size-5" /></div>
-              <h3 className="mt-6 text-base font-medium text-zinc-100">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">{description}</p>
-              <div className={`mt-6 h-px w-8 bg-current opacity-50 transition-all duration-300 group-hover:w-14 ${accent}`} />
+        <div className="max-w-2xl"><p className="text-sm font-semibold tracking-[0.18em] text-cyan-300">CREATE FLOW</p><h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl" id="features-title">从灵感，到一个像素世界</h2><p className="mt-4 text-sm leading-7 text-zinc-400">保留熟悉的图像上传与编辑流程，用更适合创作的方式，把想法一点点搭建起来。</p></div>
+        <div className="mt-11 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {steps.map(({ number, icon: Icon, title, description, accent }, index) => (
+            <article className="pixel-corners group relative border border-white/[0.1] bg-[#17182d]/65 p-5 shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-cyan-200/30 hover:bg-[#1a1c35]" key={title}>
+              <span className="absolute right-4 top-4 text-xs font-bold text-white/15">{number}</span><div className={`grid size-11 place-items-center border border-current/25 bg-white/[0.04] ${accent}`}><Icon className="size-5" /></div><h3 className="mt-7 text-base font-semibold text-white">{title}</h3><p className="mt-3 text-sm leading-6 text-zinc-500">{description}</p>{index < steps.length - 1 && <span className="absolute -right-3 top-1/2 z-10 hidden size-6 -translate-y-1/2 place-items-center border border-cyan-200/15 bg-[#111224] text-cyan-200 xl:grid">+</span>}
             </article>
           ))}
         </div>

@@ -1,17 +1,3 @@
 import { Grid2X2, LoaderCircle } from "lucide-react";
-
-interface StartGenerateButtonProps {
-  disabled: boolean;
-  isProcessing?: boolean;
-  onClick: () => void;
-}
-
-/** 开始分析当前选中的原图并生成像素网格。 */
-export default function StartGenerateButton({ disabled, isProcessing = false, onClick }: StartGenerateButtonProps) {
-  return (
-    <button type="button" disabled={disabled} onClick={onClick} className="inline-flex h-11 w-full items-center justify-center gap-2 bg-violet-500 px-5 text-sm font-medium text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 sm:w-auto">
-      {isProcessing ? <LoaderCircle className="size-4 animate-spin" /> : <Grid2X2 className="size-4" />}
-      {isProcessing ? "正在生成网格..." : "生成像素网格"}
-    </button>
-  );
-}
+interface StartGenerateButtonProps { disabled: boolean; isProcessing?: boolean; onClick: () => void; }
+export default function StartGenerateButton({ disabled, isProcessing = false, onClick }: StartGenerateButtonProps) { return <button type="button" disabled={disabled} onClick={onClick} className="glow-button inline-flex h-11 w-full items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none sm:w-auto">{isProcessing ? <LoaderCircle className="size-4 animate-spin" /> : <Grid2X2 className="size-4" />}{isProcessing ? "正在生成像素画..." : "进入像素编辑"}</button>; }

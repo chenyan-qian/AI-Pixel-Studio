@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Pixel Studio | AI 像素艺术创作平台",
-  description: "将每一张图片变成精美的像素艺术。",
+  title: "PixelVerse | 多人像素艺术创作平台",
+  description: "创造属于你的像素世界。",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
