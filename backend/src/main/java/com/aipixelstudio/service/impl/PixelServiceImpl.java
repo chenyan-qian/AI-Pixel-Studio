@@ -17,7 +17,7 @@ import java.util.Set;
 @Service
 public class PixelServiceImpl implements PixelService {
     /** 单个正方形像素格的固定可选边长。 */
-    private static final Set<Integer> SUPPORTED_PIXEL_SIZES = Set.of(4, 8, 16, 32, 64);
+    private static final Set<Integer> SUPPORTED_PIXEL_SIZES = Set.of(1, 2, 4, 8, 16, 32, 64);
     /** 防止超大图片在遍历或解码时消耗过多内存。 */
     private static final long MAX_IMAGE_PIXELS = 20_000_000L;
 

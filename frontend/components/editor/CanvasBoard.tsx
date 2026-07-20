@@ -1,30 +1,65 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
-import { PointerEvent, useEffect, useMemo, useRef, useState } from "react";
-import { fillMatrix, paintMatrixPixel, paintMatrixSoftness, TRANSPARENT, type PixelMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { Maximize, Minus, Plus } from "lucide-react";
+import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { fillMatrix, TRANSPARENT, type PixelMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
 
-const MIN_ZOOM = 5;
-const MAX_ZOOM = 24;
+const ZOOM_LEVELS = Array.from({ length: 32 }, (_, index) => (index + 1) * 25);
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 800;
 const MAX_RENDER_SIZE = 4096;
+const MAX_GRID_LINES = 4000;
+type GridPoint = { x: number; y: number };
+type ChangedCell = GridPoint;
 
-/** 根据像素矩阵重绘 Canvas，并将指针操作映射为矩阵坐标。 */
+/** 返回相邻输入点之间经过的离散像素格，避免快速移动时留下断点。 */
+function getPixelLine(from: GridPoint, to: GridPoint) {
+  const points: GridPoint[] = [];
+  let x = from.x;
+  let y = from.y;
+  const deltaX = Math.abs(to.x - from.x);
+  const deltaY = Math.abs(to.y - from.y);
+  const stepX = from.x < to.x ? 1 : -1;
+  const stepY = from.y < to.y ? 1 : -1;
+  let error = deltaX - deltaY;
+
+  while (true) {
+    points.push({ x, y });
+    if (x === to.x && y === to.y) return points;
+    const doubledError = error * 2;
+    if (doubledError > -deltaY) { error -= deltaY; x += stepX; }
+    if (doubledError < deltaX) { error += deltaX; y += stepY; }
+  }
+}
+
+function clampZoom(value: number) { return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value)); }
+
+/**
+ * Canvas 的位图尺寸始终映射到真实画布尺寸；zoom 只改变它的 CSS 显示尺寸。
+ * 因此 pixels 矩阵、导出尺寸以及鼠标编辑坐标不会随着缩放而变化。
+ */
 export default function CanvasBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gridCanvasRef = useRef<HTMLCanvasElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const drawingRef = useRef(false);
   const panningRef = useRef(false);
   const spacePressedRef = useRef(false);
+  const fitModeRef = useRef(true);
   const panStartRef = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
   const draftRef = useRef<PixelMatrix | null>(null);
   const draftSoftnessRef = useRef<SoftnessMatrix | null>(null);
   const changedRef = useRef(false);
-  const changedCellsRef = useRef<Array<{ x: number; y: number }>>([]);
-  const lastCellRef = useRef("");
-  const [zoom, setZoom] = useState(12);
+  const changedCellsRef = useRef<ChangedCell[]>([]);
+  const changedCellKeysRef = useRef(new Set<string>());
+  const pendingDrawCellsRef = useRef<ChangedCell[]>([]);
+  const lastPixelRef = useRef<GridPoint | null>(null);
+  const activePointerIdRef = useRef<number | null>(null);
+  const draftFrameRef = useRef<number | null>(null);
+  const [zoom, setZoom] = useState(100);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [draftPixels, setDraftPixels] = useState<PixelMatrix | null>(null);
-  const [draftSoftness, setDraftSoftness] = useState<SoftnessMatrix | null>(null);
   const [sourceImage, setSourceImage] = useState<HTMLImageElement | null>(null);
+
   const gridWidth = usePixelEditorStore((state) => state.gridWidth);
   const gridHeight = usePixelEditorStore((state) => state.gridHeight);
   const pixelSize = usePixelEditorStore((state) => state.pixelSize);
@@ -42,17 +77,37 @@ export default function CanvasBoard() {
   const commitPixels = usePixelEditorStore((state) => state.commitPixels);
   const setSelectedColor = usePixelEditorStore((state) => state.setSelectedColor);
   const setHoveredPixel = usePixelEditorStore((state) => state.setHoveredPixel);
-  const displayPixels = draftPixels || pixels;
-  const displaySoftness = draftSoftness || pixelSoftness;
-  const imageRatio = canvasWidth > 0 && canvasHeight > 0 ? canvasHeight / canvasWidth : gridHeight / gridWidth || 1;
-  const displayWidth = gridWidth * zoom;
-  const displayHeight = gridHeight * zoom;
+
+  // logicalSize 是作品真实尺寸；renderSize 仅为过大图像的安全预览位图尺寸。
+  const logicalWidth = canvasWidth || gridWidth * pixelSize;
+  const logicalHeight = canvasHeight || gridHeight * pixelSize;
   const { renderWidth, renderHeight } = useMemo(() => {
-    const targetWidth = Math.max(gridWidth * zoom, canvasWidth || 0);
-    const scale = Math.min(1, MAX_RENDER_SIZE / targetWidth, MAX_RENDER_SIZE / (targetWidth * imageRatio));
-    const width = Math.max(gridWidth, Math.floor(targetWidth * scale));
-    return { renderWidth: width, renderHeight: Math.max(gridHeight, Math.round(width * imageRatio)) };
-  }, [canvasWidth, gridHeight, gridWidth, imageRatio, zoom]);
+    if (!logicalWidth || !logicalHeight) return { renderWidth: 1, renderHeight: 1 };
+    const scale = Math.min(1, MAX_RENDER_SIZE / logicalWidth, MAX_RENDER_SIZE / logicalHeight);
+    return {
+      renderWidth: Math.max(gridWidth, Math.round(logicalWidth * scale)),
+      renderHeight: Math.max(gridHeight, Math.round(logicalHeight * scale)),
+    };
+  }, [gridHeight, gridWidth, logicalHeight, logicalWidth]);
+  const displayWidth = logicalWidth * zoom / 100;
+  const displayHeight = logicalHeight * zoom / 100;
+  const displayCellWidth = gridWidth ? displayWidth / gridWidth : 0;
+  const displayCellHeight = gridHeight ? displayHeight / gridHeight : 0;
+  // 小于 8 个屏幕像素的格线会覆盖大部分像素颜色（1px 模式尤其明显），因此只在可清晰分辨时显示。
+  const showGrid = zoom >= 100 && gridWidth + gridHeight <= MAX_GRID_LINES && Math.min(displayCellWidth, displayCellHeight) >= 8;
+
+  const fitToViewport = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || !logicalWidth || !logicalHeight) return;
+    const horizontalPadding = 48;
+    const verticalPadding = 48;
+    const nextZoom = clampZoom(Math.floor(Math.min(
+      (Math.max(1, viewport.clientWidth - horizontalPadding) / logicalWidth) * 100,
+      (Math.max(1, viewport.clientHeight - verticalPadding) / logicalHeight) * 100,
+    )));
+    setZoom(nextZoom);
+    setPan({ x: 0, y: 0 });
+  }, [logicalHeight, logicalWidth]);
 
   useEffect(() => {
     if (!sourceImageUrl) { setSourceImage(null); return; }
@@ -63,21 +118,28 @@ export default function CanvasBoard() {
     return () => { image.onload = null; image.onerror = null; };
   }, [sourceImageUrl]);
 
+  // 每次打开新作品或改变网格规格，都自动让整张图进入可视编辑区。
   useEffect(() => {
-    // 切换新的作品或网格规格后，画布回到初始视图位置。
-    setPan({ x: 0, y: 0 });
-  }, [gridHeight, gridWidth, sourceImageUrl]);
+    fitModeRef.current = true;
+    const frame = requestAnimationFrame(fitToViewport);
+    return () => cancelAnimationFrame(frame);
+  }, [fitToViewport, sourceImageUrl]);
 
   useEffect(() => {
-    // 空格加左键是常见图像编辑器的平移手势，不会占用浏览器右键菜单。
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const observer = new ResizeObserver(() => { if (fitModeRef.current) fitToViewport(); });
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [fitToViewport]);
+
+  useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.code !== "Space" || event.target instanceof HTMLInputElement) return;
       event.preventDefault();
       spacePressedRef.current = true;
     }
-    function handleKeyUp(event: KeyboardEvent) {
-      if (event.code === "Space") spacePressedRef.current = false;
-    }
+    function handleKeyUp(event: KeyboardEvent) { if (event.code === "Space") spacePressedRef.current = false; }
     function handleWindowBlur() { spacePressedRef.current = false; }
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -89,85 +151,84 @@ export default function CanvasBoard() {
     };
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    // 原生非被动监听才能可靠阻止浏览器页面和外层容器响应滚轮。
-    function handleNativeWheel(event: WheelEvent) {
-      event.preventDefault();
-      event.stopPropagation();
-      setZoom((value) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value + (event.deltaY < 0 ? 1 : -1))));
-    }
-    // 右键专用于画布平移，因此在 Canvas 范围内禁止浏览器上下文菜单。
-    function preventContextMenu(event: MouseEvent) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    canvas.addEventListener("wheel", handleNativeWheel, { passive: false });
-    canvas.addEventListener("contextmenu", preventContextMenu);
-    return () => {
-      canvas.removeEventListener("wheel", handleNativeWheel);
-      canvas.removeEventListener("contextmenu", preventContextMenu);
-    };
+  useEffect(() => () => {
+    if (draftFrameRef.current !== null) cancelAnimationFrame(draftFrameRef.current);
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || gridWidth === 0 || gridHeight === 0) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    const cellWidth = renderWidth / gridWidth;
-    const cellHeight = renderHeight / gridHeight;
-    context.clearRect(0, 0, renderWidth, renderHeight);
+  function getCellMetrics() {
+    return { cellWidth: renderWidth / gridWidth, cellHeight: renderHeight / gridHeight };
+  }
 
-    // 初始状态保持原图清晰；不再使用中心采样色填满整张画布。
-    if (sourceImage) {
-      context.imageSmoothingEnabled = true;
-      const sourceDrawWidth = renderWidth * sourceWidth / (canvasWidth || sourceWidth);
-      const sourceDrawHeight = renderHeight * sourceHeight / (canvasHeight || sourceHeight);
-      context.drawImage(sourceImage, 0, 0, sourceDrawWidth, sourceDrawHeight);
-    }
+  function resetCellBackground(context: CanvasRenderingContext2D, x: number, y: number) {
+    const { cellWidth, cellHeight } = getCellMetrics();
+    const left = x * cellWidth;
+    const top = y * cellHeight;
+    context.clearRect(left, top, cellWidth, cellHeight);
+    if (!sourceImage) return;
+    context.save();
+    context.beginPath();
+    context.rect(left, top, cellWidth, cellHeight);
+    context.clip();
+    const sourceDrawWidth = renderWidth * sourceWidth / (canvasWidth || sourceWidth);
+    const sourceDrawHeight = renderHeight * sourceHeight / (canvasHeight || sourceHeight);
+    context.imageSmoothingEnabled = false;
+    context.drawImage(sourceImage, 0, 0, sourceDrawWidth, sourceDrawHeight);
+    context.restore();
+  }
 
-    const editedCells: Array<{ x: number; y: number; color: string; softness: number }> = [];
-    displayPixels.forEach((row, y) => row.forEach((color, x) => {
-      const initialColor = initialPixels[y]?.[x];
-      // 与初始矩阵相同的单元继续透出原图，只有实际编辑才覆盖。
-      if (sourceImage && color === initialColor) return;
-      editedCells.push({ x, y, color, softness: displaySoftness[y]?.[x] || 0 });
-    }));
-
-    editedCells.forEach(({ x, y, color, softness }) => {
-      const left = x * cellWidth;
-      const top = y * cellHeight;
-      const blurRadius = Math.min(cellWidth, cellHeight) * softness / 260;
+  function drawCellContent(context: CanvasRenderingContext2D, x: number, y: number, color: string, softness: number) {
+    const { cellWidth, cellHeight } = getCellMetrics();
+    const left = x * cellWidth;
+    const top = y * cellHeight;
+    const blurRadius = Math.min(cellWidth, cellHeight) * softness / 260;
+    context.save();
+    if (blurRadius > 0) context.filter = `blur(${blurRadius}px)`;
+    if (color === TRANSPARENT) {
       if (blurRadius > 0) {
-        // 模糊后的填充会带一点透明度，先铺一层不透明底色，避免露出原图。
-        context.save();
-        if (color === TRANSPARENT) context.clearRect(left, top, cellWidth, cellHeight);
-        else {
-          context.fillStyle = color;
-          context.fillRect(left, top, cellWidth, cellHeight);
-        }
-        context.restore();
-      }
-      // 每个单元读取其创建时保存的柔化值，后续滑杆调整不会影响已有修改。
-      context.save();
-      if (blurRadius > 0) context.filter = `blur(${blurRadius}px)`;
-      if (color === TRANSPARENT) {
-        if (blurRadius > 0) {
-          context.globalCompositeOperation = "destination-out";
-          context.fillStyle = "#000000";
-        } else {
-          context.clearRect(left, top, cellWidth, cellHeight);
-          context.restore();
-          return;
-        }
-      } else context.fillStyle = color;
+        context.globalCompositeOperation = "destination-out";
+        context.fillStyle = "#000000";
+        context.fillRect(left, top, cellWidth, cellHeight);
+      } else context.clearRect(left, top, cellWidth, cellHeight);
+    } else {
+      context.fillStyle = color;
       context.fillRect(left, top, cellWidth, cellHeight);
-      context.restore();
-    });
+    }
+    context.restore();
+  }
 
-    // 网格线绘制在最上层，放大后仍能区分每个独立可编辑单元。
+  function redrawCells(cells: ChangedCell[], matrix: PixelMatrix, softness: SoftnessMatrix) {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!context || !gridWidth || !gridHeight) return;
+    cells.forEach(({ x, y }) => {
+      resetCellBackground(context, x, y);
+      const color = matrix[y]?.[x] ?? TRANSPARENT;
+      if (!sourceImage || color !== initialPixels[y]?.[x]) drawCellContent(context, x, y, color, softness[y]?.[x] || 0);
+    });
+  }
+
+  function drawFullCanvas() {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!context || !gridWidth || !gridHeight) return;
+    context.clearRect(0, 0, renderWidth, renderHeight);
+    if (sourceImage) {
+      context.imageSmoothingEnabled = false;
+      context.drawImage(sourceImage, 0, 0, renderWidth * sourceWidth / (canvasWidth || sourceWidth), renderHeight * sourceHeight / (canvasHeight || sourceHeight));
+    }
+    pixels.forEach((row, y) => row.forEach((color, x) => {
+      if (!sourceImage || color !== initialPixels[y]?.[x]) drawCellContent(context, x, y, color, pixelSoftness[y]?.[x] || 0);
+    }));
+  }
+
+  /** 网格为独立覆盖层：不参与图片层的合成和局部像素刷新。 */
+  function drawGridCanvas() {
+    const canvas = gridCanvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!context) return;
+    context.clearRect(0, 0, renderWidth, renderHeight);
+    if (!showGrid) return;
+    const { cellWidth, cellHeight } = getCellMetrics();
     context.beginPath();
     for (let line = 0; line <= gridWidth; line++) {
       const x = line * cellWidth;
@@ -179,39 +240,78 @@ export default function CanvasBoard() {
       context.moveTo(0, y);
       context.lineTo(renderWidth, y);
     }
-    context.strokeStyle = "rgba(15, 23, 42, 0.18)";
-    context.lineWidth = Math.max(0.75, Math.min(cellWidth, cellHeight) * 0.035);
+    context.strokeStyle = "rgba(148, 163, 184, 0.55)";
+    context.lineWidth = 1;
     context.stroke();
-  }, [canvasHeight, canvasWidth, displayPixels, displaySoftness, gridHeight, gridWidth, initialPixels, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
+  }
 
+  useEffect(() => { drawFullCanvas(); }, [canvasHeight, canvasWidth, gridHeight, gridWidth, initialPixels, pixelSoftness, pixels, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
+  useEffect(() => { drawGridCanvas(); }, [gridHeight, gridWidth, renderHeight, renderWidth, showGrid]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    function handleNativeWheel(event: WheelEvent) {
+      event.preventDefault();
+      event.stopPropagation();
+      changeZoom(event.deltaY < 0 ? "in" : "out");
+    }
+    function preventContextMenu(event: MouseEvent) { event.preventDefault(); event.stopPropagation(); }
+    canvas.addEventListener("wheel", handleNativeWheel, { passive: false });
+    canvas.addEventListener("contextmenu", preventContextMenu);
+    return () => {
+      canvas.removeEventListener("wheel", handleNativeWheel);
+      canvas.removeEventListener("contextmenu", preventContextMenu);
+    };
+  });
+
+  // 先反算 CSS 缩放，再反算渲染位图与真实像素矩阵坐标。
   function getCell(event: PointerEvent<HTMLCanvasElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
+    const renderedX = (event.clientX - rect.left) * renderWidth / rect.width;
+    const renderedY = (event.clientY - rect.top) * renderHeight / rect.height;
     return {
-      x: Math.min(gridWidth - 1, Math.max(0, Math.floor(((event.clientX - rect.left) / rect.width) * gridWidth))),
-      y: Math.min(gridHeight - 1, Math.max(0, Math.floor(((event.clientY - rect.top) / rect.height) * gridHeight))),
+      x: Math.min(gridWidth - 1, Math.max(0, Math.floor(renderedX / (renderWidth / gridWidth)))),
+      y: Math.min(gridHeight - 1, Math.max(0, Math.floor(renderedY / (renderHeight / gridHeight)))),
     };
   }
 
-  function drawAt(x: number, y: number) {
-    const color = tool === "eraser" ? TRANSPARENT : selectedColor;
-    const current = draftRef.current || pixels;
-    const currentSoftness = draftSoftnessRef.current || pixelSoftness;
-    const next = paintMatrixPixel(current, x, y, color);
-    const nextSoftness = paintMatrixSoftness(currentSoftness, x, y, edgeSoftness);
-    if (next !== current || nextSoftness !== currentSoftness) {
-      changedRef.current = true;
-      changedCellsRef.current.push({ x, y });
-      draftRef.current = next;
-      draftSoftnessRef.current = nextSoftness;
-      setDraftPixels(next);
-      setDraftSoftness(nextSoftness);
-    }
+  function scheduleDraftRender() {
+    if (draftFrameRef.current !== null) return;
+    draftFrameRef.current = requestAnimationFrame(() => {
+      draftFrameRef.current = null;
+      const matrix = draftRef.current;
+      const softness = draftSoftnessRef.current;
+      const changed = pendingDrawCellsRef.current.splice(0);
+      if (matrix && softness && changed.length) redrawCells(changed, matrix, softness);
+    });
+  }
+
+  function drawLine(from: GridPoint, to: GridPoint) {
+    const nextPixels = draftRef.current;
+    const nextSoftness = draftSoftnessRef.current;
+    if (!nextPixels || !nextSoftness) return;
+    let changed = false;
+    getPixelLine(from, to).forEach(({ x, y }) => {
+      const color = tool === "eraser" ? initialPixels[y]?.[x] ?? TRANSPARENT : selectedColor;
+      const softness = tool === "eraser" ? 0 : edgeSoftness;
+      if (nextPixels[y]?.[x] === color && nextSoftness[y]?.[x] === softness) return;
+      nextPixels[y][x] = color;
+      nextSoftness[y][x] = softness;
+      const key = `${x}:${y}`;
+      if (!changedCellKeysRef.current.has(key)) {
+        changedCellKeysRef.current.add(key);
+        changedCellsRef.current.push({ x, y });
+      }
+      pendingDrawCellsRef.current.push({ x, y });
+      changed = true;
+    });
+    if (changed) { changedRef.current = true; scheduleDraftRender(); }
   }
 
   function handlePointerDown(event: PointerEvent<HTMLCanvasElement>) {
     const isPanGesture = event.button === 2 || event.button === 1 || (event.button === 0 && spacePressedRef.current);
     if (isPanGesture) {
-      // 鼠标右键、中键或空格加左键只控制画布视图，不触发绘制或颜色选择。
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
       panningRef.current = true;
@@ -220,27 +320,28 @@ export default function CanvasBoard() {
     }
     if (event.button !== 0) return;
     const { x, y } = getCell(event);
-    const color = displayPixels[y]?.[x] || TRANSPARENT;
-    if (tool === "eyedropper") {
-      if (color !== TRANSPARENT) setSelectedColor(color);
-      return;
-    }
+    const color = (draftRef.current || pixels)[y]?.[x] || TRANSPARENT;
+    if (tool === "eyedropper") { if (color !== TRANSPARENT) setSelectedColor(color); return; }
     if (tool === "fill") {
       const next = fillMatrix(pixels, x, y, selectedColor);
       if (next !== pixels) {
         const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => next[rowIndex][columnIndex] !== pixels[rowIndex][columnIndex] ? edgeSoftness : softness));
-        commitPixels(next, nextSoftness, { action: "fill", description: `使用填充工具修改区域颜色为 ${selectedColor}` });
+        commitPixels(next, nextSoftness, { action: "fill", description: `使用填充工具修改区域颜色为${selectedColor}` });
       }
       return;
     }
     event.currentTarget.setPointerCapture(event.pointerId);
+    activePointerIdRef.current = event.pointerId;
     drawingRef.current = true;
     changedRef.current = false;
     changedCellsRef.current = [];
-    draftRef.current = pixels;
-    draftSoftnessRef.current = pixelSoftness;
-    lastCellRef.current = `${x}:${y}`;
-    drawAt(x, y);
+    changedCellKeysRef.current = new Set();
+    pendingDrawCellsRef.current = [];
+    draftRef.current = pixels.map((row) => [...row]);
+    draftSoftnessRef.current = pixelSoftness.map((row) => [...row]);
+    const point = { x, y };
+    lastPixelRef.current = point;
+    drawLine(point, point);
   }
 
   function handlePointerMove(event: PointerEvent<HTMLCanvasElement>) {
@@ -249,52 +350,72 @@ export default function CanvasBoard() {
       setPan({ x: start.offsetX + event.clientX - start.x, y: start.offsetY + event.clientY - start.y });
       return;
     }
-    const { x, y } = getCell(event);
-    setHoveredPixel({ x, y, color: displayPixels[y]?.[x] || TRANSPARENT });
-    if (!drawingRef.current) return;
-    const key = `${x}:${y}`;
-    if (key === lastCellRef.current) return;
-    lastCellRef.current = key;
-    drawAt(x, y);
+    const currentPixel = getCell(event);
+    const visiblePixels = draftRef.current || pixels;
+    setHoveredPixel({ x: currentPixel.x, y: currentPixel.y, color: visiblePixels[currentPixel.y]?.[currentPixel.x] || TRANSPARENT });
+    if (!drawingRef.current || activePointerIdRef.current !== event.pointerId) return;
+    const lastPixel = lastPixelRef.current;
+    if (!lastPixel || (lastPixel.x === currentPixel.x && lastPixel.y === currentPixel.y)) return;
+    drawLine(lastPixel, currentPixel);
+    lastPixelRef.current = currentPixel;
   }
 
   function finishStroke() {
     if (drawingRef.current && changedRef.current && draftRef.current && draftSoftnessRef.current) {
       const cells = changedCellsRef.current;
       const first = cells[0];
-      const action = tool === "eraser" ? "擦除" : "修改";
-      const color = tool === "eraser" ? "透明" : selectedColor;
-      const description = cells.length === 1 && first
-        ? `${action}坐标(${first.x},${first.y})像素颜色为${color}`
-        : `${action}${cells.length}个像素颜色为${color}`;
+      const action = tool === "eraser" ? "恢复" : "修改";
+      const color = tool === "eraser" ? "初始颜色" : selectedColor;
+      const description = cells.length === 1 && first ? `${action}坐标(${first.x},${first.y})像素颜色为${color}` : `${action}${cells.length}个像素颜色为${color}`;
       commitPixels(draftRef.current, draftSoftnessRef.current, { action: "pixel_change", description });
     }
     drawingRef.current = false;
     changedRef.current = false;
     changedCellsRef.current = [];
+    changedCellKeysRef.current = new Set();
+    pendingDrawCellsRef.current = [];
+    lastPixelRef.current = null;
+    activePointerIdRef.current = null;
+    if (draftFrameRef.current !== null) { cancelAnimationFrame(draftFrameRef.current); draftFrameRef.current = null; }
     draftRef.current = null;
     draftSoftnessRef.current = null;
-    setDraftPixels(null);
-    setDraftSoftness(null);
   }
 
-  function finishPointerAction() {
-    if (panningRef.current) {
-      panningRef.current = false;
-      setPan((current) => ({ ...current }));
-      return;
-    }
+  function finishPointerAction(event: PointerEvent<HTMLCanvasElement>) {
+    if (panningRef.current) { panningRef.current = false; return; }
+    if (activePointerIdRef.current !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     finishStroke();
   }
 
+  function changeZoom(direction: "in" | "out") {
+    fitModeRef.current = false;
+    setZoom((current) => {
+      if (direction === "in") return ZOOM_LEVELS.find((level) => level > current) ?? MAX_ZOOM;
+      return [...ZOOM_LEVELS].reverse().find((level) => level < current) ?? MIN_ZOOM;
+    });
+  }
+
+  function setActualSize() { fitModeRef.current = false; setZoom(100); setPan({ x: 0, y: 0 }); }
+  function fitScreen() { fitModeRef.current = true; fitToViewport(); }
+
   return (
     <section className="flex min-h-0 flex-1 flex-col bg-[#0b0c12]" aria-label="像素画布">
-      <div className="flex h-12 items-center justify-between border-b border-white/[0.1] px-4">
+      <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/[0.1] px-4">
         <span className="text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px</span>
-        <div className="flex items-center gap-1"><button type="button" title="缩小" aria-label="缩小" onClick={() => setZoom((value) => Math.max(MIN_ZOOM, value - 1))} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Minus className="size-4" /></button><span className="w-11 text-center text-xs tabular-nums text-zinc-400">{zoom}x</span><button type="button" title="放大" aria-label="放大" onClick={() => setZoom((value) => Math.min(MAX_ZOOM, value + 1))} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Plus className="size-4" /></button></div>
+        <div className="flex items-center gap-0.5">
+          <button type="button" title="缩小" aria-label="缩小" onClick={() => changeZoom("out")} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Minus className="size-4" /></button>
+          <button type="button" title="当前比例（100%）" aria-label="当前比例（100%）" onClick={setActualSize} className="h-8 min-w-12 px-1 text-xs tabular-nums text-zinc-300 hover:bg-white/[0.08]">{Math.round(zoom)}%</button>
+          <button type="button" title="放大" aria-label="放大" onClick={() => changeZoom("in")} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Plus className="size-4" /></button>
+          <span className="mx-1 h-4 border-l border-white/[0.12]" />
+          <button type="button" title="适应窗口" aria-label="适应窗口" onClick={fitScreen} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Maximize className="size-3.5" /></button>
+        </div>
       </div>
-      <div className="pixel-checker flex min-h-0 flex-1 items-start justify-start overflow-auto overscroll-contain p-6">
-        <canvas ref={canvasRef} width={renderWidth} height={renderHeight} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={finishPointerAction} onPointerCancel={finishPointerAction} onPointerLeave={() => { if (!drawingRef.current && !panningRef.current) setHoveredPixel(null); }} onAuxClick={(event) => event.preventDefault()} className={panningRef.current ? "cursor-grabbing [image-rendering:auto]" : "cursor-crosshair [image-rendering:auto]"} style={{ width: displayWidth, height: displayHeight, transform: `translate(${pan.x}px, ${pan.y}px)` }} />
+      <div ref={viewportRef} className="pixel-checker flex min-h-0 flex-1 items-center justify-center overflow-auto overscroll-contain p-6">
+        <div className="relative shrink-0" style={{ width: displayWidth, height: displayHeight, transform: `translate(${pan.x}px, ${pan.y}px)` }}>
+          <canvas ref={canvasRef} width={renderWidth} height={renderHeight} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={finishPointerAction} onPointerCancel={finishPointerAction} onPointerLeave={() => { if (!drawingRef.current && !panningRef.current) setHoveredPixel(null); }} onAuxClick={(event) => event.preventDefault()} className={panningRef.current ? "size-full cursor-grabbing [image-rendering:pixelated]" : "size-full cursor-crosshair [image-rendering:pixelated]"} />
+          <canvas ref={gridCanvasRef} width={renderWidth} height={renderHeight} aria-hidden="true" className="pointer-events-none absolute inset-0 size-full [image-rendering:pixelated]" />
+        </div>
       </div>
     </section>
   );

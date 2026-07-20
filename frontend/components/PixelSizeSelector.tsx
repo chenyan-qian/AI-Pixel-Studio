@@ -1,4 +1,4 @@
-const PIXEL_SIZES = [4, 8, 16, 32, 64];
+const PIXEL_SIZES = [1, 2, 4, 8, 16, 32, 64];
 
 interface PixelSizeSelectorProps {
   imageWidth: number;
