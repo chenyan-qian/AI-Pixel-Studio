@@ -4,7 +4,10 @@ export interface PixelExportOptions {
   pixels: PixelMatrix;
   initialPixels: PixelMatrix;
   pixelSoftness: SoftnessMatrix;
-  size: number;
+  gridWidth: number;
+  gridHeight: number;
+  canvasWidth: number;
+  canvasHeight: number;
   sourceImageUrl: string | null;
   sourceWidth: number;
   sourceHeight: number;
@@ -30,15 +33,18 @@ export async function exportPixelImage({
   pixels,
   initialPixels,
   pixelSoftness,
-  size,
+  gridWidth,
+  gridHeight,
+  canvasWidth,
+  canvasHeight,
   sourceImageUrl,
   sourceWidth,
   sourceHeight,
   mimeType,
 }: PixelExportOptions) {
   const sourceImage = sourceImageUrl ? await loadSourceImage(sourceImageUrl) : null;
-  const width = sourceWidth || sourceImage?.naturalWidth || size;
-  const height = sourceHeight || sourceImage?.naturalHeight || size;
+  const width = canvasWidth || gridWidth;
+  const height = canvasHeight || gridHeight;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -49,10 +55,10 @@ export async function exportPixelImage({
     context.fillStyle = "#FFFFFF";
     context.fillRect(0, 0, width, height);
   }
-  if (sourceImage) context.drawImage(sourceImage, 0, 0, width, height);
+  if (sourceImage) context.drawImage(sourceImage, 0, 0, sourceWidth || sourceImage.naturalWidth, sourceHeight || sourceImage.naturalHeight);
 
-  const cellWidth = width / size;
-  const cellHeight = height / size;
+  const cellWidth = width / gridWidth;
+  const cellHeight = height / gridHeight;
   pixels.forEach((row, y) => row.forEach((color, x) => {
     // 未修改的初始格子继续显示原图，和编辑器预览保持一致。
     if (sourceImage && color === initialPixels[y]?.[x]) return;

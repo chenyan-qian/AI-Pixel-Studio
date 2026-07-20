@@ -26,7 +26,11 @@ export interface HistoryRecord {
 export interface HistoryCommit { action: Exclude<HistoryAction, "initial">; description: string; }
 
 interface PixelEditorState {
-  size: number;
+  gridWidth: number;
+  gridHeight: number;
+  pixelSize: number;
+  canvasWidth: number;
+  canvasHeight: number;
   pixels: PixelMatrix;
   pixelSoftness: SoftnessMatrix;
   initialPixels: PixelMatrix;
@@ -41,7 +45,7 @@ interface PixelEditorState {
   history: HistoryRecord[];
   historyIndex: number;
   hoveredPixel: HoveredPixel | null;
-  initialize: (size: number, cells: PixelCell[], sourceImage: { url: string; width: number; height: number }) => void;
+  initialize: (gridWidth: number, gridHeight: number, pixelSize: number, canvasWidth: number, canvasHeight: number, cells: PixelCell[], sourceImage: { url: string; width: number; height: number }) => void;
   setWorkId: (workId: number) => void;
   setSelectedColor: (color: string) => void;
   setTool: (tool: EditorTool) => void;
@@ -57,8 +61,8 @@ interface PixelEditorState {
 
 function cloneMatrix(matrix: PixelMatrix) { return matrix.map((row) => [...row]); }
 function cloneSoftnessMatrix(matrix: SoftnessMatrix) { return matrix.map((row) => [...row]); }
-function createTransparentMatrix(size: number): PixelMatrix { return Array.from({ length: size }, () => Array.from({ length: size }, () => TRANSPARENT)); }
-function createSoftnessMatrix(size: number, value = 0): SoftnessMatrix { return Array.from({ length: size }, () => Array.from({ length: size }, () => value)); }
+function createTransparentMatrix(width: number, height: number): PixelMatrix { return Array.from({ length: height }, () => Array.from({ length: width }, () => TRANSPARENT)); }
+function createSoftnessMatrix(width: number, height: number, value = 0): SoftnessMatrix { return Array.from({ length: height }, () => Array.from({ length: width }, () => value)); }
 function now() { return new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }); }
 
 /** 用行程编码压缩旧快照，避免一直保留完整矩阵对象。 */
@@ -70,18 +74,20 @@ function compressSnapshot(snapshot: PixelSnapshot) {
     if (last?.[0] === value) last[1] += 1;
     else encoded.push([value, 1]);
   });
-  return JSON.stringify({ size: snapshot.pixels.length, values: encoded });
+  return JSON.stringify({ width: snapshot.pixels[0]?.length || 0, height: snapshot.pixels.length, values: encoded });
 }
 
 function decompressSnapshot(value: string): PixelSnapshot {
-  const parsed = JSON.parse(value) as { size: number; values: Array<[string, number]> };
+  const parsed = JSON.parse(value) as { width?: number; height?: number; size?: number; values: Array<[string, number]> };
+  const width = parsed.width ?? parsed.size ?? 0;
+  const height = parsed.height ?? parsed.size ?? 0;
   const cells = parsed.values.flatMap(([entry, count]) => Array.from({ length: count }, () => entry));
-  const pixels = createTransparentMatrix(parsed.size);
-  const softness = createSoftnessMatrix(parsed.size);
+  const pixels = createTransparentMatrix(width, height);
+  const softness = createSoftnessMatrix(width, height);
   cells.forEach((entry, index) => {
     const [color, rawSoftness] = entry.split("|");
-    const y = Math.floor(index / parsed.size);
-    const x = index % parsed.size;
+    const y = Math.floor(index / width);
+    const x = index % width;
     pixels[y][x] = color;
     softness[y][x] = Number(rawSoftness);
   });
@@ -105,16 +111,16 @@ function compact(records: HistoryRecord[]) {
 }
 
 export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
-  size: 0, pixels: [], pixelSoftness: [], initialPixels: [], sourceImageUrl: null, sourceWidth: 0, sourceHeight: 0, workId: null,
+  gridWidth: 0, gridHeight: 0, pixelSize: 0, canvasWidth: 0, canvasHeight: 0, pixels: [], pixelSoftness: [], initialPixels: [], sourceImageUrl: null, sourceWidth: 0, sourceHeight: 0, workId: null,
   selectedColor: "#FF5733", tool: "pencil", edgeSoftness: 0,
   palette: ["#FF5733", "#FF0000", "#00C853", "#2563EB", "#111827", "#FFFFFF"],
   history: [], historyIndex: -1, hoveredPixel: null,
 
-  initialize: (size, cells, sourceImage) => {
-    const matrix = createTransparentMatrix(size);
+  initialize: (gridWidth, gridHeight, pixelSize, canvasWidth, canvasHeight, cells, sourceImage) => {
+    const matrix = createTransparentMatrix(gridWidth, gridHeight);
     cells.forEach((cell) => { if (matrix[cell.y]?.[cell.x] !== undefined) matrix[cell.y][cell.x] = cell.color; });
-    const softness = createSoftnessMatrix(size);
-    set({ size, pixels: cloneMatrix(matrix), pixelSoftness: cloneSoftnessMatrix(softness), initialPixels: cloneMatrix(matrix), sourceImageUrl: sourceImage.url, sourceWidth: sourceImage.width, sourceHeight: sourceImage.height, workId: null, history: [{ id: 1, action: "initial", description: "初始像素化", timestamp: now(), pixelData: cloneMatrix(matrix), softnessData: cloneSoftnessMatrix(softness) }], historyIndex: 0, hoveredPixel: null });
+    const softness = createSoftnessMatrix(gridWidth, gridHeight);
+    set({ gridWidth, gridHeight, pixelSize, canvasWidth, canvasHeight, pixels: cloneMatrix(matrix), pixelSoftness: cloneSoftnessMatrix(softness), initialPixels: cloneMatrix(matrix), sourceImageUrl: sourceImage.url, sourceWidth: sourceImage.width, sourceHeight: sourceImage.height, workId: null, history: [{ id: 1, action: "initial", description: "初始像素化", timestamp: now(), pixelData: cloneMatrix(matrix), softnessData: cloneSoftnessMatrix(softness) }], historyIndex: 0, hoveredPixel: null });
   },
   setWorkId: (workId) => set({ workId }),
   setSelectedColor: (color) => set({ selectedColor: color.toUpperCase() }),
@@ -138,7 +144,7 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
   // 撤销和重做与点击历史记录面板时走同一套恢复逻辑。
   undo: () => { const { historyIndex, goToHistory } = get(); if (historyIndex > 0) goToHistory(historyIndex - 1); },
   redo: () => { const { historyIndex, history, goToHistory } = get(); if (historyIndex < history.length - 1) goToHistory(historyIndex + 1); },
-  clear: () => { const { size, edgeSoftness } = get(); get().commitPixels(createTransparentMatrix(size), createSoftnessMatrix(size, edgeSoftness), { action: "clear", description: "清空画布" }); },
+  clear: () => { const { gridWidth, gridHeight, edgeSoftness } = get(); get().commitPixels(createTransparentMatrix(gridWidth, gridHeight), createSoftnessMatrix(gridWidth, gridHeight, edgeSoftness), { action: "clear", description: "清空画布" }); },
 }));
 
 export function paintMatrixPixel(matrix: PixelMatrix, x: number, y: number, color: string) { if (!matrix[y] || matrix[y][x] === undefined || matrix[y][x] === color) return matrix; const next = cloneMatrix(matrix); next[y][x] = color; return next; }

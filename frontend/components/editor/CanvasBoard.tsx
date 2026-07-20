@@ -25,7 +25,11 @@ export default function CanvasBoard() {
   const [draftPixels, setDraftPixels] = useState<PixelMatrix | null>(null);
   const [draftSoftness, setDraftSoftness] = useState<SoftnessMatrix | null>(null);
   const [sourceImage, setSourceImage] = useState<HTMLImageElement | null>(null);
-  const size = usePixelEditorStore((state) => state.size);
+  const gridWidth = usePixelEditorStore((state) => state.gridWidth);
+  const gridHeight = usePixelEditorStore((state) => state.gridHeight);
+  const pixelSize = usePixelEditorStore((state) => state.pixelSize);
+  const canvasWidth = usePixelEditorStore((state) => state.canvasWidth);
+  const canvasHeight = usePixelEditorStore((state) => state.canvasHeight);
   const pixels = usePixelEditorStore((state) => state.pixels);
   const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
   const initialPixels = usePixelEditorStore((state) => state.initialPixels);
@@ -40,15 +44,15 @@ export default function CanvasBoard() {
   const setHoveredPixel = usePixelEditorStore((state) => state.setHoveredPixel);
   const displayPixels = draftPixels || pixels;
   const displaySoftness = draftSoftness || pixelSoftness;
-  const imageRatio = sourceWidth > 0 && sourceHeight > 0 ? sourceHeight / sourceWidth : 1;
-  const displayWidth = size * zoom;
-  const displayHeight = Math.round(displayWidth * imageRatio);
+  const imageRatio = canvasWidth > 0 && canvasHeight > 0 ? canvasHeight / canvasWidth : gridHeight / gridWidth || 1;
+  const displayWidth = gridWidth * zoom;
+  const displayHeight = gridHeight * zoom;
   const { renderWidth, renderHeight } = useMemo(() => {
-    const targetWidth = Math.max(size * zoom, sourceWidth || 0);
+    const targetWidth = Math.max(gridWidth * zoom, canvasWidth || 0);
     const scale = Math.min(1, MAX_RENDER_SIZE / targetWidth, MAX_RENDER_SIZE / (targetWidth * imageRatio));
-    const width = Math.max(size, Math.floor(targetWidth * scale));
-    return { renderWidth: width, renderHeight: Math.max(size, Math.round(width * imageRatio)) };
-  }, [imageRatio, size, sourceWidth, zoom]);
+    const width = Math.max(gridWidth, Math.floor(targetWidth * scale));
+    return { renderWidth: width, renderHeight: Math.max(gridHeight, Math.round(width * imageRatio)) };
+  }, [canvasWidth, gridHeight, gridWidth, imageRatio, zoom]);
 
   useEffect(() => {
     if (!sourceImageUrl) { setSourceImage(null); return; }
@@ -62,7 +66,7 @@ export default function CanvasBoard() {
   useEffect(() => {
     // 切换新的作品或网格规格后，画布回到初始视图位置。
     setPan({ x: 0, y: 0 });
-  }, [size, sourceImageUrl]);
+  }, [gridHeight, gridWidth, sourceImageUrl]);
 
   useEffect(() => {
     // 空格加左键是常见图像编辑器的平移手势，不会占用浏览器右键菜单。
@@ -109,17 +113,19 @@ export default function CanvasBoard() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || size === 0) return;
+    if (!canvas || gridWidth === 0 || gridHeight === 0) return;
     const context = canvas.getContext("2d");
     if (!context) return;
-    const cellWidth = renderWidth / size;
-    const cellHeight = renderHeight / size;
+    const cellWidth = renderWidth / gridWidth;
+    const cellHeight = renderHeight / gridHeight;
     context.clearRect(0, 0, renderWidth, renderHeight);
 
     // 初始状态保持原图清晰；不再使用中心采样色填满整张画布。
     if (sourceImage) {
       context.imageSmoothingEnabled = true;
-      context.drawImage(sourceImage, 0, 0, renderWidth, renderHeight);
+      const sourceDrawWidth = renderWidth * sourceWidth / (canvasWidth || sourceWidth);
+      const sourceDrawHeight = renderHeight * sourceHeight / (canvasHeight || sourceHeight);
+      context.drawImage(sourceImage, 0, 0, sourceDrawWidth, sourceDrawHeight);
     }
 
     const editedCells: Array<{ x: number; y: number; color: string; softness: number }> = [];
@@ -163,24 +169,26 @@ export default function CanvasBoard() {
 
     // 网格线绘制在最上层，放大后仍能区分每个独立可编辑单元。
     context.beginPath();
-    for (let line = 0; line <= size; line++) {
+    for (let line = 0; line <= gridWidth; line++) {
       const x = line * cellWidth;
-      const y = line * cellHeight;
       context.moveTo(x, 0);
       context.lineTo(x, renderHeight);
+    }
+    for (let line = 0; line <= gridHeight; line++) {
+      const y = line * cellHeight;
       context.moveTo(0, y);
       context.lineTo(renderWidth, y);
     }
     context.strokeStyle = "rgba(15, 23, 42, 0.18)";
     context.lineWidth = Math.max(0.75, Math.min(cellWidth, cellHeight) * 0.035);
     context.stroke();
-  }, [displayPixels, displaySoftness, initialPixels, renderHeight, renderWidth, size, sourceImage]);
+  }, [canvasHeight, canvasWidth, displayPixels, displaySoftness, gridHeight, gridWidth, initialPixels, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
 
   function getCell(event: PointerEvent<HTMLCanvasElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
     return {
-      x: Math.min(size - 1, Math.max(0, Math.floor(((event.clientX - rect.left) / rect.width) * size))),
-      y: Math.min(size - 1, Math.max(0, Math.floor(((event.clientY - rect.top) / rect.height) * size))),
+      x: Math.min(gridWidth - 1, Math.max(0, Math.floor(((event.clientX - rect.left) / rect.width) * gridWidth))),
+      y: Math.min(gridHeight - 1, Math.max(0, Math.floor(((event.clientY - rect.top) / rect.height) * gridHeight))),
     };
   }
 
@@ -282,7 +290,7 @@ export default function CanvasBoard() {
   return (
     <section className="flex min-h-0 flex-1 flex-col bg-[#0b0c12]" aria-label="像素画布">
       <div className="flex h-12 items-center justify-between border-b border-white/[0.1] px-4">
-        <span className="text-xs text-zinc-500">{size} × {size}</span>
+        <span className="text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px</span>
         <div className="flex items-center gap-1"><button type="button" title="缩小" aria-label="缩小" onClick={() => setZoom((value) => Math.max(MIN_ZOOM, value - 1))} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Minus className="size-4" /></button><span className="w-11 text-center text-xs tabular-nums text-zinc-400">{zoom}x</span><button type="button" title="放大" aria-label="放大" onClick={() => setZoom((value) => Math.min(MAX_ZOOM, value + 1))} className="grid size-8 place-items-center text-zinc-300 hover:bg-white/[0.08]"><Plus className="size-4" /></button></div>
       </div>
       <div className="pixel-checker flex min-h-0 flex-1 items-start justify-start overflow-auto overscroll-contain p-6">

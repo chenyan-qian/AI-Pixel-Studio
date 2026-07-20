@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImagePreview, { type UploadedImage } from "@/components/ImagePreview";
-import PixelSizeSelector, { type PixelSize } from "@/components/PixelSizeSelector";
+import PixelSizeSelector from "@/components/PixelSizeSelector";
 import StartGenerateButton from "@/components/StartGenerateButton";
 import UploadArea from "@/components/UploadArea";
 import { Navbar } from "@/components/navbar";
@@ -18,7 +18,11 @@ interface UploadResponse {
 }
 
 interface PixelGrid {
-  size: number;
+  gridWidth: number;
+  gridHeight: number;
+  pixelSize: number;
+  canvasWidth: number;
+  canvasHeight: number;
   pixels: PixelCell[];
 }
 
@@ -40,7 +44,7 @@ export default function WorkspacePage() {
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [originalImage, setOriginalImage] = useState<UploadedImage | null>(null);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
-  const [pixelSize, setPixelSize] = useState<PixelSize>(64);
+  const [pixelSize, setPixelSize] = useState(16);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -73,15 +77,16 @@ export default function WorkspacePage() {
     try {
       const response = await request.post<FormData, UploadResponse>("/api/image/upload", formData, { headers: { "Content-Type": "multipart/form-data" } });
       if (response.code !== 200 || !response.data) throw new Error(response.msg || "图片上传失败，请稍后重试。");
-      setSourceFile(file);
-      setOriginalImage({
+      const image = {
         name: response.data.fileName,
         size: file.size,
         width: response.data.width,
         height: response.data.height,
         previewUrl: URL.createObjectURL(file),
         uploadedUrl: getUploadUrl(response.data.url),
-      });
+      };
+      setSourceFile(file);
+      setOriginalImage(image);
     } catch (error) {
       const responseMessage = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setUploadError(responseMessage || (error instanceof Error ? error.message : "图片上传失败，请稍后重试。"));
@@ -90,7 +95,7 @@ export default function WorkspacePage() {
     }
   }, []);
 
-  function handlePixelSizeChange(size: PixelSize) {
+  function handlePixelSizeChange(size: number) {
     // 网格规格变化后必须重新按原图区域映射生成矩阵。
     setPixelSize(size);
   }
@@ -109,7 +114,7 @@ export default function WorkspacePage() {
       if (response.code !== 200 || !response.data?.pixels) throw new Error(response.msg || "像素网格生成失败，请稍后重试。");
       // 矩阵写入全局编辑器状态后跳转，编辑页不再依赖图片文件或处理结果图片。
       // 使用服务端图片地址而非本地 Blob URL，页面跳转后底图仍可正常加载。
-      usePixelEditorStore.getState().initialize(response.data.size, response.data.pixels, {
+      usePixelEditorStore.getState().initialize(response.data.gridWidth, response.data.gridHeight, response.data.pixelSize, response.data.canvasWidth, response.data.canvasHeight, response.data.pixels, {
         url: originalImage.uploadedUrl,
         width: originalImage.width,
         height: originalImage.height,
@@ -141,7 +146,7 @@ export default function WorkspacePage() {
           {uploadError && <p className="mt-4 border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-200" role="alert">{uploadError}</p>}
           {originalImage && <div className="mt-7 space-y-7 border-t border-white/[0.1] pt-7">
             <ImagePreview image={originalImage} />
-            <PixelSizeSelector value={pixelSize} onChange={handlePixelSizeChange} />
+            <PixelSizeSelector imageWidth={originalImage.width} imageHeight={originalImage.height} value={pixelSize} onChange={handlePixelSizeChange} />
             <div>
               <StartGenerateButton disabled={!sourceFile || processing} isProcessing={processing} onClick={handleStartGenerate} />
               {processError && <p className="mt-4 border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-200" role="alert">{processError}</p>}
