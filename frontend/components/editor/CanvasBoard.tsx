@@ -240,8 +240,8 @@ export default function CanvasBoard() {
       context.moveTo(0, y);
       context.lineTo(renderWidth, y);
     }
-    context.strokeStyle = "rgba(148, 163, 184, 0.55)";
-    context.lineWidth = 1;
+    context.strokeStyle = "rgba(148, 163, 184, 0.32)";
+    context.lineWidth = 0.5;
     context.stroke();
   }
 
