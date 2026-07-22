@@ -1,8 +1,8 @@
-import { TRANSPARENT, type PixelMatrix, type SoftnessMatrix } from "@/lib/pixel-editor-store";
+import { TRANSPARENT, type PixelGrid, type PixelOverrideMatrix, type SoftnessMatrix } from "@/lib/pixel-editor-store";
 
 export interface PixelExportOptions {
-  pixels: PixelMatrix;
-  initialPixels: PixelMatrix;
+  pixelGrid: PixelGrid;
+  pixelOverrides: PixelOverrideMatrix;
   pixelSoftness: SoftnessMatrix;
   gridWidth: number;
   gridHeight: number;
@@ -30,8 +30,8 @@ function loadSourceImage(sourceImageUrl: string) {
  * 网格线和缩放仅用于编辑，不会写入导出文件。
  */
 export async function exportPixelImage({
-  pixels,
-  initialPixels,
+  pixelGrid,
+  pixelOverrides,
   pixelSoftness,
   gridWidth,
   gridHeight,
@@ -59,9 +59,9 @@ export async function exportPixelImage({
 
   const cellWidth = width / gridWidth;
   const cellHeight = height / gridHeight;
-  pixels.forEach((row, y) => row.forEach((color, x) => {
+  pixelGrid.forEach((row, y) => row.forEach((color, x) => {
     // 未修改的初始格子继续显示原图，和编辑器预览保持一致。
-    if (sourceImage && color === initialPixels[y]?.[x]) return;
+    if (sourceImage && !pixelOverrides[y]?.[x]) return;
 
     const left = x * cellWidth;
     const top = y * cellHeight;

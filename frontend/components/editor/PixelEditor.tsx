@@ -22,8 +22,8 @@ function toRgbText(color: string) {
 
 /** 参考 Piskel 布局的像素编辑工作台。 */
 export default function PixelEditor() {
-  const pixels = usePixelEditorStore((state) => state.pixels);
-  const initialPixels = usePixelEditorStore((state) => state.initialPixels);
+  const pixelGrid = usePixelEditorStore((state) => state.pixelGrid);
+  const pixelOverrides = usePixelEditorStore((state) => state.pixelOverrides);
   const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
   const gridWidth = usePixelEditorStore((state) => state.gridWidth);
   const gridHeight = usePixelEditorStore((state) => state.gridHeight);
@@ -47,7 +47,7 @@ export default function PixelEditor() {
     setSaveMessage("");
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
     try {
-      const dataUrl = await exportPixelImage({ pixels, initialPixels, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight, mimeType });
+      const dataUrl = await exportPixelImage({ pixelGrid, pixelOverrides, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight, mimeType });
       downloadImage(dataUrl, format);
     } catch (error) {
       setSaveMessage(error instanceof Error ? error.message : "导出失败，请稍后重试。");
@@ -60,7 +60,7 @@ export default function PixelEditor() {
     setSaving(true);
     setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
-    const payload = { title: "未命名像素作品", size: pixelSize, gridWidth, gridHeight, canvasWidth, canvasHeight, pixelData: pixels, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, compressedSnapshot: record.compressedSnapshot })) };
+    const payload = { title: "未命名像素作品", size: pixelSize, gridWidth, gridHeight, canvasWidth, canvasHeight, pixelData: { pixelGrid, pixelOverrides }, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, overrideData: record.overrideData, compressedSnapshot: record.compressedSnapshot })) };
     try {
       // 第一次保存会创建作品，之后继续保存会更新同一条作品记录。
       const response = workId

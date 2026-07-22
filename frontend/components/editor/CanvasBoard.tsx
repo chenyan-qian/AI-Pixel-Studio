@@ -2,7 +2,7 @@
 
 import { Maximize, Minus, Plus } from "lucide-react";
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fillMatrix, TRANSPARENT, type PixelMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { fillMatrix, getConnectedPixelBlocks, getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
 
 const ZOOM_LEVELS = Array.from({ length: 32 }, (_, index) => (index + 1) * 25);
 const MIN_ZOOM = 1;
@@ -49,6 +49,7 @@ export default function CanvasBoard() {
   const panStartRef = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
   const draftRef = useRef<PixelMatrix | null>(null);
   const draftSoftnessRef = useRef<SoftnessMatrix | null>(null);
+  const draftOverridesRef = useRef<PixelOverrideMatrix | null>(null);
   const changedRef = useRef(false);
   const changedCellsRef = useRef<ChangedCell[]>([]);
   const changedCellKeysRef = useRef(new Set<string>());
@@ -65,16 +66,17 @@ export default function CanvasBoard() {
   const pixelSize = usePixelEditorStore((state) => state.pixelSize);
   const canvasWidth = usePixelEditorStore((state) => state.canvasWidth);
   const canvasHeight = usePixelEditorStore((state) => state.canvasHeight);
-  const pixels = usePixelEditorStore((state) => state.pixels);
+  const pixelGrid = usePixelEditorStore((state) => state.pixelGrid);
   const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
-  const initialPixels = usePixelEditorStore((state) => state.initialPixels);
+  const initialPixelGrid = usePixelEditorStore((state) => state.initialPixelGrid);
+  const pixelOverrides = usePixelEditorStore((state) => state.pixelOverrides);
   const sourceImageUrl = usePixelEditorStore((state) => state.sourceImageUrl);
   const sourceWidth = usePixelEditorStore((state) => state.sourceWidth);
   const sourceHeight = usePixelEditorStore((state) => state.sourceHeight);
   const tool = usePixelEditorStore((state) => state.tool);
   const selectedColor = usePixelEditorStore((state) => state.selectedColor);
   const edgeSoftness = usePixelEditorStore((state) => state.edgeSoftness);
-  const commitPixels = usePixelEditorStore((state) => state.commitPixels);
+  const commitPixelGrid = usePixelEditorStore((state) => state.commitPixelGrid);
   const setSelectedColor = usePixelEditorStore((state) => state.setSelectedColor);
   const setHoveredPixel = usePixelEditorStore((state) => state.setHoveredPixel);
 
@@ -196,14 +198,15 @@ export default function CanvasBoard() {
     context.restore();
   }
 
-  function redrawCells(cells: ChangedCell[], matrix: PixelMatrix, softness: SoftnessMatrix) {
+  function redrawCells(cells: ChangedCell[], matrix: PixelMatrix, softness: SoftnessMatrix, overrides: PixelOverrideMatrix) {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (!context || !gridWidth || !gridHeight) return;
     cells.forEach(({ x, y }) => {
       resetCellBackground(context, x, y);
       const color = matrix[y]?.[x] ?? TRANSPARENT;
-      if (!sourceImage || color !== initialPixels[y]?.[x]) drawCellContent(context, x, y, color, softness[y]?.[x] || 0);
+      // A matching initial colour is still an explicit paint operation and must cover the source image.
+      if (!sourceImage || overrides[y]?.[x]) drawCellContent(context, x, y, color, softness[y]?.[x] || 0);
     });
   }
 
@@ -216,8 +219,8 @@ export default function CanvasBoard() {
       context.imageSmoothingEnabled = false;
       context.drawImage(sourceImage, 0, 0, renderWidth * sourceWidth / (canvasWidth || sourceWidth), renderHeight * sourceHeight / (canvasHeight || sourceHeight));
     }
-    pixels.forEach((row, y) => row.forEach((color, x) => {
-      if (!sourceImage || color !== initialPixels[y]?.[x]) drawCellContent(context, x, y, color, pixelSoftness[y]?.[x] || 0);
+    pixelGrid.forEach((row, y) => row.forEach((color, x) => {
+      if (!sourceImage || pixelOverrides[y]?.[x]) drawCellContent(context, x, y, color, pixelSoftness[y]?.[x] || 0);
     }));
   }
 
@@ -245,7 +248,7 @@ export default function CanvasBoard() {
     context.stroke();
   }
 
-  useEffect(() => { drawFullCanvas(); }, [canvasHeight, canvasWidth, gridHeight, gridWidth, initialPixels, pixelSoftness, pixels, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
+  useEffect(() => { drawFullCanvas(); }, [canvasHeight, canvasWidth, gridHeight, gridWidth, pixelOverrides, pixelSoftness, pixelGrid, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
   useEffect(() => { drawGridCanvas(); }, [gridHeight, gridWidth, renderHeight, renderWidth, showGrid]);
 
   useEffect(() => {
@@ -268,12 +271,10 @@ export default function CanvasBoard() {
   // 先反算 CSS 缩放，再反算渲染位图与真实像素矩阵坐标。
   function getCell(event: PointerEvent<HTMLCanvasElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
-    const renderedX = (event.clientX - rect.left) * renderWidth / rect.width;
-    const renderedY = (event.clientY - rect.top) * renderHeight / rect.height;
-    return {
-      x: Math.min(gridWidth - 1, Math.max(0, Math.floor(renderedX / (renderWidth / gridWidth)))),
-      y: Math.min(gridHeight - 1, Math.max(0, Math.floor(renderedY / (renderHeight / gridHeight)))),
-    };
+    const logicalX = (event.clientX - rect.left) * logicalWidth / rect.width;
+    const logicalY = (event.clientY - rect.top) * logicalHeight / rect.height;
+    const { row, col } = getPixelBlockCoordinates(logicalX, logicalY, pixelSize, gridWidth, gridHeight);
+    return { x: col, y: row };
   }
 
   function scheduleDraftRender() {
@@ -282,22 +283,26 @@ export default function CanvasBoard() {
       draftFrameRef.current = null;
       const matrix = draftRef.current;
       const softness = draftSoftnessRef.current;
+      const overrides = draftOverridesRef.current;
       const changed = pendingDrawCellsRef.current.splice(0);
-      if (matrix && softness && changed.length) redrawCells(changed, matrix, softness);
+      if (matrix && softness && overrides && changed.length) redrawCells(changed, matrix, softness, overrides);
     });
   }
 
   function drawLine(from: GridPoint, to: GridPoint) {
     const nextPixels = draftRef.current;
     const nextSoftness = draftSoftnessRef.current;
-    if (!nextPixels || !nextSoftness) return;
+    const nextOverrides = draftOverridesRef.current;
+    if (!nextPixels || !nextSoftness || !nextOverrides) return;
     let changed = false;
     getPixelLine(from, to).forEach(({ x, y }) => {
-      const color = tool === "eraser" ? initialPixels[y]?.[x] ?? TRANSPARENT : selectedColor;
+      const color = tool === "eraser" ? initialPixelGrid[y]?.[x] ?? TRANSPARENT : selectedColor;
       const softness = tool === "eraser" ? 0 : edgeSoftness;
-      if (nextPixels[y]?.[x] === color && nextSoftness[y]?.[x] === softness) return;
+      const isOverridden = tool !== "eraser";
+      if (nextPixels[y]?.[x] === color && nextSoftness[y]?.[x] === softness && nextOverrides[y]?.[x] === isOverridden) return;
       nextPixels[y][x] = color;
       nextSoftness[y][x] = softness;
+      nextOverrides[y][x] = isOverridden;
       const key = `${x}:${y}`;
       if (!changedCellKeysRef.current.has(key)) {
         changedCellKeysRef.current.add(key);
@@ -307,6 +312,10 @@ export default function CanvasBoard() {
       changed = true;
     });
     if (changed) { changedRef.current = true; scheduleDraftRender(); }
+  }
+
+  function paintPixelBlock(row: number, col: number) {
+    drawLine({ x: col, y: row }, { x: col, y: row });
   }
 
   function handlePointerDown(event: PointerEvent<HTMLCanvasElement>) {
@@ -320,13 +329,16 @@ export default function CanvasBoard() {
     }
     if (event.button !== 0) return;
     const { x, y } = getCell(event);
-    const color = (draftRef.current || pixels)[y]?.[x] || TRANSPARENT;
+    const color = (draftRef.current || pixelGrid)[y]?.[x] || TRANSPARENT;
     if (tool === "eyedropper") { if (color !== TRANSPARENT) setSelectedColor(color); return; }
     if (tool === "fill") {
-      const next = fillMatrix(pixels, x, y, selectedColor);
-      if (next !== pixels) {
-        const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => next[rowIndex][columnIndex] !== pixels[rowIndex][columnIndex] ? edgeSoftness : softness));
-        commitPixels(next, nextSoftness, { action: "fill", description: `使用填充工具修改区域颜色为${selectedColor}` });
+      const connectedBlocks = getConnectedPixelBlocks(pixelGrid, x, y);
+      const next = fillMatrix(pixelGrid, x, y, selectedColor);
+      if (connectedBlocks.length) {
+        const connectedKeys = new Set(connectedBlocks.map(({ row, col }) => `${col}:${row}`));
+        const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) ? edgeSoftness : softness));
+        const nextOverrides = pixelOverrides.map((row, rowIndex) => row.map((overridden, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) || overridden));
+        commitPixelGrid(next, nextSoftness, nextOverrides, { action: "fill", description: `Fill with ${selectedColor}` });
       }
       return;
     }
@@ -337,11 +349,12 @@ export default function CanvasBoard() {
     changedCellsRef.current = [];
     changedCellKeysRef.current = new Set();
     pendingDrawCellsRef.current = [];
-    draftRef.current = pixels.map((row) => [...row]);
+    draftRef.current = pixelGrid.map((row) => [...row]);
     draftSoftnessRef.current = pixelSoftness.map((row) => [...row]);
+    draftOverridesRef.current = pixelOverrides.map((row) => [...row]);
     const point = { x, y };
     lastPixelRef.current = point;
-    drawLine(point, point);
+    paintPixelBlock(y, x);
   }
 
   function handlePointerMove(event: PointerEvent<HTMLCanvasElement>) {
@@ -351,7 +364,7 @@ export default function CanvasBoard() {
       return;
     }
     const currentPixel = getCell(event);
-    const visiblePixels = draftRef.current || pixels;
+    const visiblePixels = draftRef.current || pixelGrid;
     setHoveredPixel({ x: currentPixel.x, y: currentPixel.y, color: visiblePixels[currentPixel.y]?.[currentPixel.x] || TRANSPARENT });
     if (!drawingRef.current || activePointerIdRef.current !== event.pointerId) return;
     const lastPixel = lastPixelRef.current;
@@ -361,13 +374,13 @@ export default function CanvasBoard() {
   }
 
   function finishStroke() {
-    if (drawingRef.current && changedRef.current && draftRef.current && draftSoftnessRef.current) {
+    if (drawingRef.current && changedRef.current && draftRef.current && draftSoftnessRef.current && draftOverridesRef.current) {
       const cells = changedCellsRef.current;
       const first = cells[0];
       const action = tool === "eraser" ? "恢复" : "修改";
       const color = tool === "eraser" ? "初始颜色" : selectedColor;
       const description = cells.length === 1 && first ? `${action}坐标(${first.x},${first.y})像素颜色为${color}` : `${action}${cells.length}个像素颜色为${color}`;
-      commitPixels(draftRef.current, draftSoftnessRef.current, { action: "pixel_change", description });
+      commitPixelGrid(draftRef.current, draftSoftnessRef.current, draftOverridesRef.current, { action: "pixel_change", description });
     }
     drawingRef.current = false;
     changedRef.current = false;
@@ -379,6 +392,7 @@ export default function CanvasBoard() {
     if (draftFrameRef.current !== null) { cancelAnimationFrame(draftFrameRef.current); draftFrameRef.current = null; }
     draftRef.current = null;
     draftSoftnessRef.current = null;
+    draftOverridesRef.current = null;
   }
 
   function finishPointerAction(event: PointerEvent<HTMLCanvasElement>) {
