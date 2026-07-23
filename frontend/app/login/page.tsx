@@ -6,6 +6,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveSession } from "@/lib/auth";
 import request from "@/lib/request";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LoginResponse {
   code: number;
@@ -37,6 +38,7 @@ export default function LoginPage() {
 
   return (
     <main className="grid-background relative grid min-h-screen place-items-center overflow-hidden bg-[#08090d] px-5 py-10 text-zinc-100">
+      <div className="absolute right-5 top-5 z-10"><ThemeToggle /></div>
       <div className="absolute inset-x-0 top-0 h-[440px] bg-[radial-gradient(ellipse_at_top,rgba(91,77,183,0.23),transparent_64%)]" />
       <section className="relative w-full max-w-[420px] border border-white/[0.12] bg-[#10111a]/90 p-7 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-9" aria-labelledby="login-title">
         <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-white"><span className="grid size-9 place-items-center rounded-md bg-violet-500 text-white"><Sparkles className="size-4" /></span>PixelVerse</Link>

@@ -5,6 +5,7 @@ import { ChevronDown, CircleUserRound, LogOut, Menu, Settings, Sparkles, UserRou
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
   { label: "首页", href: "/" },
@@ -49,6 +50,7 @@ export function Navbar() {
         </Link>
         <div className="hidden items-center gap-1 md:flex">{links.map((link) => <Link className="rounded-md px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-cyan-100" href={link.href} key={link.href}>{link.label}</Link>)}</div>
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           {user ? <div className="relative"><button type="button" className="flex h-9 items-center gap-2 rounded-md border border-cyan-200/20 bg-white/[0.03] px-3 text-sm text-zinc-200 transition hover:border-cyan-300/50 hover:text-white" onClick={() => setAccountOpen((open) => !open)} aria-expanded={accountOpen} aria-haspopup="menu"><UserRound className="size-4 text-cyan-300" />{user.nickname || user.username}<ChevronDown className={`size-3.5 transition ${accountOpen ? "rotate-180" : ""}`} /></button>{accountOpen && <div className="absolute right-0 top-11 z-20 w-52">{accountMenu}</div>}</div> : <><Link className="flex h-9 items-center rounded-md px-4 text-sm text-zinc-300 transition-colors hover:text-white" href="/login">登录</Link><Link className="glow-button flex h-9 items-center rounded-md px-4 text-sm font-medium text-white" href="/register">注册</Link></>}
         </div>
         <button type="button" className="grid size-9 place-items-center rounded-md text-zinc-300 hover:bg-white/[0.06] md:hidden" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "关闭导航" : "打开导航"}>{menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}</button>

@@ -3,6 +3,7 @@
 import { Maximize, Minus, Plus } from "lucide-react";
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fillMatrix, getConnectedPixelBlocks, getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { useTheme } from "@/context/ThemeContext";
 
 const ZOOM_LEVELS = Array.from({ length: 32 }, (_, index) => (index + 1) * 25);
 const MIN_ZOOM = 1;
@@ -39,6 +40,7 @@ function clampZoom(value: number) { return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM,
  * 因此 pixels 矩阵、导出尺寸以及鼠标编辑坐标不会随着缩放而变化。
  */
 export default function CanvasBoard() {
+  const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -243,13 +245,13 @@ export default function CanvasBoard() {
       context.moveTo(0, y);
       context.lineTo(renderWidth, y);
     }
-    context.strokeStyle = "rgba(148, 163, 184, 0.32)";
+    context.strokeStyle = theme === "dark" ? "rgba(148, 163, 184, 0.32)" : "rgba(51, 65, 85, 0.34)";
     context.lineWidth = 0.5;
     context.stroke();
   }
 
   useEffect(() => { drawFullCanvas(); }, [canvasHeight, canvasWidth, gridHeight, gridWidth, pixelOverrides, pixelSoftness, pixelGrid, renderHeight, renderWidth, sourceHeight, sourceImage, sourceWidth]);
-  useEffect(() => { drawGridCanvas(); }, [gridHeight, gridWidth, renderHeight, renderWidth, showGrid]);
+  useEffect(() => { drawGridCanvas(); }, [gridHeight, gridWidth, renderHeight, renderWidth, showGrid, theme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -414,7 +416,7 @@ export default function CanvasBoard() {
   function fitScreen() { fitModeRef.current = true; fitToViewport(); }
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col bg-[#0b0c12]" aria-label="像素画布">
+    <section className="theme-editor flex min-h-0 flex-1 flex-col" aria-label="像素画布">
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/[0.1] px-4">
         <span className="text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px</span>
         <div className="flex items-center gap-0.5">
