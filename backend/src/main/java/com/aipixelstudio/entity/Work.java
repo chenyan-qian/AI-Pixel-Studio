@@ -14,6 +14,7 @@ public class Work {
     private Long userId;
     private String title;
     private Integer pixelSize;
+    private String sourceImageUrl;
     private String pixelData;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
@@ -26,6 +27,8 @@ public class Work {
     public void setTitle(String title) { this.title = title; }
     public Integer getPixelSize() { return pixelSize; }
     public void setPixelSize(Integer pixelSize) { this.pixelSize = pixelSize; }
+    public String getSourceImageUrl() { return sourceImageUrl; }
+    public void setSourceImageUrl(String sourceImageUrl) { this.sourceImageUrl = sourceImageUrl; }
     public String getPixelData() { return pixelData; }
     public void setPixelData(String pixelData) { this.pixelData = pixelData; }
     public LocalDateTime getCreateTime() { return createTime; }

@@ -42,7 +42,7 @@ export function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-5">
-      <nav className="pixel-corners mx-auto flex h-[66px] max-w-6xl items-center justify-between border border-white/[0.11] bg-[#101120]/80 px-4 shadow-xl shadow-black/20 backdrop-blur-xl sm:px-5">
+      <nav className="mx-auto flex h-[66px] max-w-6xl items-center justify-between border border-white/[0.11] bg-[#101120]/80 px-4 shadow-xl shadow-black/20 backdrop-blur-xl sm:px-5">
         <Link className="flex min-w-0 items-center gap-2.5" href="/" aria-label="PixelVerse 首页">
           <span className="grid size-9 shrink-0 place-items-center rounded-md border border-cyan-200/30 bg-gradient-to-br from-violet-500 via-blue-500 to-cyan-400 text-white shadow-lg shadow-cyan-500/20"><Sparkles className="size-4" strokeWidth={2.5} /></span>
           <span className="min-w-0"><span className="block text-sm font-bold tracking-wide text-white">PixelVerse</span><span className="hidden text-[10px] text-cyan-200/75 sm:block">Create Your Pixel World</span></span>

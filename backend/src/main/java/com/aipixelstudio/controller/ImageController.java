@@ -1,6 +1,8 @@
 package com.aipixelstudio.controller;
 
 import com.aipixelstudio.common.Result;
+import com.aipixelstudio.entity.UploadFile;
+import com.aipixelstudio.mapper.UploadFileMapper;
 import com.aipixelstudio.vo.ImageUploadVO;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
+import java.time.LocalDateTime;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** 接收像素画工作流使用的原图。 */
 @RestController
@@ -24,13 +29,18 @@ import java.util.Set;
 public class ImageController {
     private static final Set<String> SUPPORTED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp");
     private static final Path UPLOAD_DIRECTORY = Path.of("uploads").toAbsolutePath().normalize();
+    private final UploadFileMapper uploadFileMapper;
+
+    public ImageController(UploadFileMapper uploadFileMapper) {
+        this.uploadFileMapper = uploadFileMapper;
+    }
 
     /**
      * 将支持的图片保存到本地 uploads 目录，并返回基础元数据。
      * 该接口继续由现有 JWT 拦截器保护。
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Result<ImageUploadVO> upload(@RequestParam("file") MultipartFile file) {
+    public Result<ImageUploadVO> upload(@RequestParam("file") MultipartFile file, HttpServletRequest servletRequest) {
         if (file.isEmpty()) throw new IllegalArgumentException("请选择要上传的图片。");
 
         String originalName = file.getOriginalFilename();
@@ -43,10 +53,19 @@ public class ImageController {
         try {
             ImageDimension dimension = readDimension(file, extension);
             Files.createDirectories(UPLOAD_DIRECTORY);
-            Path target = UPLOAD_DIRECTORY.resolve(fileName).normalize();
+            String storedName = UUID.randomUUID() + "." + extension;
+            Path target = UPLOAD_DIRECTORY.resolve(storedName).normalize();
             if (!target.getParent().equals(UPLOAD_DIRECTORY)) throw new IllegalArgumentException("无效的文件名。");
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-            return Result.success(new ImageUploadVO(fileName, "/uploads/" + fileName, dimension.width(), dimension.height()));
+            UploadFile uploadFile = new UploadFile();
+            uploadFile.setUserId((Long) servletRequest.getAttribute("userId"));
+            uploadFile.setStoredName(storedName);
+            uploadFile.setOriginalName(fileName);
+            uploadFile.setFileType("UPLOAD");
+            uploadFile.setFileSize(file.getSize());
+            uploadFile.setCreateTime(LocalDateTime.now());
+            uploadFileMapper.insert(uploadFile);
+            return Result.success(new ImageUploadVO(fileName, "/uploads/" + storedName, dimension.width(), dimension.height()));
         } catch (IOException exception) {
             throw new IllegalArgumentException("图片保存失败，请稍后重试。");
         }

@@ -20,15 +20,21 @@ public class JwtUtil {
         this.expirationMilliseconds = expirationMilliseconds;
     }
 
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, String role) {
         Date now = new Date();
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("username", username)
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationMilliseconds))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    /** Compatibility overload for old callers. */
+    public String generateToken(Long userId, String username) {
+        return generateToken(userId, username, "USER");
     }
 
     public Claims parseToken(String token) {

@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   password VARCHAR(100) NOT NULL COMMENT 'BCrypt password hash',
   nickname VARCHAR(32) NOT NULL COMMENT 'Display name',
   avatar VARCHAR(500) DEFAULT NULL COMMENT 'Avatar URL',
+  role VARCHAR(16) NOT NULL DEFAULT 'USER' COMMENT 'USER or ADMIN',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '1 active, 0 disabled',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `work` (
   user_id BIGINT NOT NULL,
   title VARCHAR(100) NOT NULL,
   pixel_size INT NOT NULL,
+  source_image_url VARCHAR(500) DEFAULT NULL COMMENT 'Original uploaded image URL',
   pixel_data LONGTEXT NOT NULL COMMENT 'Current complete pixel matrix JSON',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -46,3 +49,33 @@ CREATE TABLE IF NOT EXISTS work_history (
   CONSTRAINT fk_work_history_work FOREIGN KEY (work_id) REFERENCES `work` (id) ON DELETE CASCADE,
   CONSTRAINT fk_work_history_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Per-user pixel work history';
+
+CREATE TABLE IF NOT EXISTS operation_log (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  operation VARCHAR(255) NOT NULL,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id), KEY idx_operation_log_create_time (create_time),
+  CONSTRAINT fk_operation_log_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Administrator operation audit log';
+
+CREATE TABLE IF NOT EXISTS upload_file (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  stored_name VARCHAR(255) NOT NULL,
+  original_name VARCHAR(255) NOT NULL,
+  file_type VARCHAR(32) NOT NULL DEFAULT 'UPLOAD',
+  file_size BIGINT NOT NULL,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id), UNIQUE KEY uk_upload_file_stored_name (stored_name),
+  KEY idx_upload_file_create_time (create_time),
+  CONSTRAINT fk_upload_file_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Uploaded file metadata';
+
+CREATE TABLE IF NOT EXISTS generation_log (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id), KEY idx_generation_log_create_time (create_time),
+  CONSTRAINT fk_generation_log_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Successful pixel generation statistics';

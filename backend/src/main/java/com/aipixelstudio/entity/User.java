@@ -14,6 +14,10 @@ public class User {
     private String password;
     private String nickname;
     private String avatar;
+    /** USER: normal user; ADMIN: administrator. */
+    private String role;
+    /** 1: active, 0: disabled. */
+    private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -27,6 +31,10 @@ public class User {
     public void setNickname(String nickname) { this.nickname = nickname; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }

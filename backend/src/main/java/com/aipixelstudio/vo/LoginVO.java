@@ -5,6 +5,7 @@ public class LoginVO {
     private String username;
     private String nickname;
     private String avatar;
+    private String role;
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
@@ -14,4 +15,6 @@ public class LoginVO {
     public void setNickname(String nickname) { this.nickname = nickname; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

@@ -4,6 +4,7 @@ import com.aipixelstudio.dto.LoginDTO;
 import com.aipixelstudio.entity.User;
 import com.aipixelstudio.mapper.UserMapper;
 import com.aipixelstudio.service.UserService;
+import com.aipixelstudio.service.AdminService;
 import com.aipixelstudio.utils.JwtUtil;
 import com.aipixelstudio.vo.LoginVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,11 +19,13 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final AdminService adminService;
 
-    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, AdminService adminService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.adminService = adminService;
     }
 
     @Override
@@ -38,6 +41,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(registerDTO.getUsername());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setNickname(hasText(registerDTO.getNickname()) ? registerDTO.getNickname() : registerDTO.getUsername());
+        user.setRole("USER");
+        user.setStatus(1);
         user.setCreateTime(now);
         user.setUpdateTime(now);
         userMapper.insert(user);
@@ -50,11 +55,15 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("用户名或密码错误");
         }
 
+        if (!Integer.valueOf(1).equals(user.getStatus())) throw new IllegalArgumentException("Account is disabled");
         LoginVO loginVO = new LoginVO();
-        loginVO.setToken(jwtUtil.generateToken(user.getId(), user.getUsername()));
+        String role = user.getRole() == null ? "USER" : user.getRole();
+        loginVO.setToken(jwtUtil.generateToken(user.getId(), user.getUsername(), role));
         loginVO.setUsername(user.getUsername());
         loginVO.setNickname(user.getNickname());
         loginVO.setAvatar(user.getAvatar());
+        loginVO.setRole(role);
+        if ("ADMIN".equals(role)) adminService.recordOperation(user.getId(), "登录后台");
         return loginVO;
     }
 

@@ -60,7 +60,7 @@ export default function PixelEditor() {
     setSaving(true);
     setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
-    const payload = { title: "未命名像素作品", size: pixelSize, gridWidth, gridHeight, canvasWidth, canvasHeight, pixelData: { pixelGrid, pixelOverrides }, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, overrideData: record.overrideData, compressedSnapshot: record.compressedSnapshot })) };
+    const payload = { sourceImageUrl, title: "未命名像素作品", size: pixelSize, gridWidth, gridHeight, canvasWidth, canvasHeight, pixelData: { pixelGrid, pixelOverrides }, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, overrideData: record.overrideData, compressedSnapshot: record.compressedSnapshot })) };
     try {
       // 第一次保存会创建作品，之后继续保存会更新同一条作品记录。
       const response = workId

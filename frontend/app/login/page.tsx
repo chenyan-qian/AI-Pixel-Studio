@@ -10,7 +10,7 @@ import request from "@/lib/request";
 interface LoginResponse {
   code: number;
   msg: string;
-  data: { token: string; username: string; nickname: string; avatar?: string | null };
+  data: { token: string; username: string; nickname: string; avatar?: string | null; role: "USER" | "ADMIN" };
 }
 
 export default function LoginPage() {
@@ -28,7 +28,7 @@ export default function LoginPage() {
       if (response.code !== 200 || !response.data?.token) throw new Error(response.msg || "登录失败");
       saveSession(response.data.token, response.data);
       // 登录成功后先回到首页，由用户自行决定是否进入工作台。
-      router.replace("/");
+      router.replace(response.data.role === "ADMIN" ? "/admin" : "/");
     } catch (caughtError) {
       const responseMessage = (caughtError as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setError(responseMessage || (caughtError instanceof Error ? caughtError.message : "登录失败，请稍后重试"));

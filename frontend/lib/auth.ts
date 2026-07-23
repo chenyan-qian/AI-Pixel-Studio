@@ -2,6 +2,7 @@ export interface AuthUser {
   username: string;
   nickname: string;
   avatar?: string | null;
+  role?: "USER" | "ADMIN";
 }
 
 const TOKEN_KEY = "ai-pixel-token";
@@ -24,6 +25,8 @@ export function getUser(): AuthUser | null {
   if (!value) return null;
   try { return JSON.parse(value) as AuthUser; } catch { clearSession(); return null; }
 }
+
+export function isAdmin() { return getUser()?.role === "ADMIN"; }
 
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);

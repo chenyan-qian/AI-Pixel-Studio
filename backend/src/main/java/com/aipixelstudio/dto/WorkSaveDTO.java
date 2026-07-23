@@ -10,6 +10,7 @@ import java.util.List;
 public class WorkSaveDTO {
     private String title;
     @NotNull private Integer size;
+    private String sourceImageUrl;
     @NotNull private JsonNode pixelData;
     @NotNull @Valid private List<HistoryRecordSaveDTO> history;
 
@@ -17,6 +18,8 @@ public class WorkSaveDTO {
     public void setTitle(String title) { this.title = title; }
     public Integer getSize() { return size; }
     public void setSize(Integer size) { this.size = size; }
+    public String getSourceImageUrl() { return sourceImageUrl; }
+    public void setSourceImageUrl(String sourceImageUrl) { this.sourceImageUrl = sourceImageUrl; }
     public JsonNode getPixelData() { return pixelData; }
     public void setPixelData(JsonNode pixelData) { this.pixelData = pixelData; }
     public List<HistoryRecordSaveDTO> getHistory() { return history; }

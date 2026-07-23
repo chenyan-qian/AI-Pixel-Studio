@@ -49,6 +49,7 @@ public class WorkServiceImpl implements WorkService {
         }
         work.setTitle(request.getTitle() == null || request.getTitle().isBlank() ? "未命名像素作品" : request.getTitle().trim());
         work.setPixelSize(request.getSize());
+        if (request.getSourceImageUrl() != null && !request.getSourceImageUrl().isBlank()) work.setSourceImageUrl(request.getSourceImageUrl());
         work.setPixelData(json(request.getPixelData()));
         work.setUpdateTime(LocalDateTime.now());
         if (work.getId() == null) workMapper.insert(work); else workMapper.updateById(work);

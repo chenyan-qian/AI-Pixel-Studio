@@ -2,6 +2,8 @@ package com.aipixelstudio.controller;
 
 import com.aipixelstudio.common.Result;
 import com.aipixelstudio.dto.PixelResultDTO;
+import com.aipixelstudio.entity.GenerationLog;
+import com.aipixelstudio.mapper.GenerationLogMapper;
 import com.aipixelstudio.service.PixelService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,15 +11,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 /** 将图片分析为可编辑像素网格的接口。 */
 @RestController
 @RequestMapping("/api/pixel")
 public class PixelController {
     private final PixelService pixelService;
+    private final GenerationLogMapper generationLogMapper;
 
-    public PixelController(PixelService pixelService) {
+    public PixelController(PixelService pixelService, GenerationLogMapper generationLogMapper) {
         this.pixelService = pixelService;
+        this.generationLogMapper = generationLogMapper;
     }
 
     /**
@@ -25,7 +31,12 @@ public class PixelController {
      */
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<PixelResultDTO> analyze(@RequestParam("file") MultipartFile file,
-                                          @RequestParam("pixelSize") int pixelSize) {
-        return Result.success(pixelService.analyze(file, pixelSize));
+                                          @RequestParam("pixelSize") int pixelSize, HttpServletRequest servletRequest) {
+        PixelResultDTO result = pixelService.analyze(file, pixelSize);
+        GenerationLog log = new GenerationLog();
+        log.setUserId((Long) servletRequest.getAttribute("userId"));
+        log.setCreateTime(LocalDateTime.now());
+        generationLogMapper.insert(log);
+        return Result.success(result);
     }
 }
