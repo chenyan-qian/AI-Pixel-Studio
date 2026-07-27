@@ -12,6 +12,7 @@ import { downloadImage, exportPixelImage } from "@/lib/pixel-export";
 import { TRANSPARENT, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { buildWorkPayload } from "@/lib/work";
 
 interface SaveWorkResponse { code: number; msg: string; data: { id: number }; }
 
@@ -61,12 +62,12 @@ export default function PixelEditor() {
     setSaving(true);
     setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
-    const payload = { sourceImageUrl, title: "未命名像素作品", size: pixelSize, gridWidth, gridHeight, canvasWidth, canvasHeight, pixelData: { pixelGrid, pixelOverrides }, history: history.map((record) => ({ id: record.id, operationType: record.action, operationDesc: record.description, operationTime: record.timestamp, pixelData: record.pixelData, softnessData: record.softnessData, overrideData: record.overrideData, compressedSnapshot: record.compressedSnapshot })) };
+    const payload = buildWorkPayload(usePixelEditorStore.getState());
     try {
       // 第一次保存会创建作品，之后继续保存会更新同一条作品记录。
       const response = workId
-        ? await request.put<typeof payload, SaveWorkResponse>(`/api/works/${workId}`, payload)
-        : await request.post<typeof payload, SaveWorkResponse>("/api/works", payload);
+        ? await request.put<typeof payload, SaveWorkResponse>(`/api/work/${workId}`, payload)
+        : await request.post<typeof payload, SaveWorkResponse>("/api/work/create", payload);
       if (response.code !== 200 || !response.data) throw new Error(response.msg || "保存失败");
       setWorkId(response.data.id);
       setSaveMessage("已保存");

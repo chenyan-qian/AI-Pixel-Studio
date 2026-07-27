@@ -3,13 +3,11 @@ package com.aipixelstudio.controller;
 import com.aipixelstudio.common.Result;
 import com.aipixelstudio.dto.WorkSaveDTO;
 import com.aipixelstudio.entity.Work;
-import com.aipixelstudio.entity.WorkHistory;
 import com.aipixelstudio.service.WorkService;
-import com.aipixelstudio.utils.JwtUtil;
 import com.aipixelstudio.vo.WorkSaveVO;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,31 +18,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/** Work ownership is taken only from the authenticated request, never from client input. */
 @RestController
-@RequestMapping("/api/works")
-/** 作品接口统一从 JWT 中识别用户归属，不接受前端直接传 userId。 */
+@RequestMapping("/api/work")
 public class WorkController {
     private final WorkService workService;
-    private final JwtUtil jwtUtil;
 
-    public WorkController(WorkService workService, JwtUtil jwtUtil) {
+    public WorkController(WorkService workService) {
         this.workService = workService;
-        this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public Result<WorkSaveVO> create(@Valid @RequestBody WorkSaveDTO request, HttpServletRequest servletRequest) {
         return Result.success(workService.save(currentUserId(servletRequest), null, request));
     }
 
+    /** Used by the editor Save control after automatic creation. */
     @PutMapping("/{workId}")
     public Result<WorkSaveVO> update(@PathVariable Long workId, @Valid @RequestBody WorkSaveDTO request, HttpServletRequest servletRequest) {
         return Result.success(workService.save(currentUserId(servletRequest), workId, request));
     }
 
-    @GetMapping("/{workId}/history")
-    public Result<List<WorkHistory>> history(@PathVariable Long workId, HttpServletRequest servletRequest) {
-        return Result.success(workService.history(currentUserId(servletRequest), workId));
+    @GetMapping("/my")
+    public Result<List<Work>> my(HttpServletRequest servletRequest) {
+        return Result.success(workService.myWorks(currentUserId(servletRequest)));
     }
 
     @GetMapping("/{workId}")
@@ -52,10 +49,13 @@ public class WorkController {
         return Result.success(workService.detail(currentUserId(servletRequest), workId));
     }
 
+    @DeleteMapping("/{workId}")
+    public Result<Void> delete(@PathVariable Long workId, HttpServletRequest servletRequest) {
+        workService.delete(currentUserId(servletRequest), workId);
+        return Result.success(null);
+    }
+
     private Long currentUserId(HttpServletRequest request) {
-        // 请求进入当前控制器前，JwtInterceptor 已完成请求头校验。
-        String token = request.getHeader("Authorization").substring(7);
-        Claims claims = jwtUtil.parseToken(token);
-        return Long.valueOf(claims.getSubject());
+        return (Long) request.getAttribute("userId");
     }
 }

@@ -10,6 +10,7 @@ import { Navbar } from "@/components/navbar";
 import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
 import { type PixelCell, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
+import { buildWorkPayload } from "@/lib/work";
 
 interface UploadResponse {
   code: number;
@@ -44,6 +45,7 @@ export default function WorkspacePage() {
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [originalImage, setOriginalImage] = useState<UploadedImage | null>(null);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [workTitle, setWorkTitle] = useState("");
   const [pixelSize, setPixelSize] = useState(16);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -87,6 +89,7 @@ export default function WorkspacePage() {
       };
       setSourceFile(file);
       setOriginalImage(image);
+      setWorkTitle(file.name.replace(/\.[^/.]+$/, ""));
     } catch (error) {
       const responseMessage = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setUploadError(responseMessage || (error instanceof Error ? error.message : "图片上传失败，请稍后重试。"));
@@ -119,6 +122,11 @@ export default function WorkspacePage() {
         width: originalImage.width,
         height: originalImage.height,
       });
+      const title = workTitle.trim() || originalImage.name.replace(/\.[^/.]+$/, "");
+      usePixelEditorStore.getState().setWorkTitle(title);
+      const workResponse = await request.post("/api/work/create", buildWorkPayload(usePixelEditorStore.getState(), title)) as unknown as { code: number; msg: string; data: { id: number } };
+      if (workResponse.code !== 200 || !workResponse.data) throw new Error(workResponse.msg || "Failed to create work");
+      usePixelEditorStore.getState().setWorkId(workResponse.data.id);
       router.push("/editor");
     } catch (error) {
       const responseMessage = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
@@ -146,6 +154,7 @@ export default function WorkspacePage() {
           {uploadError && <p className="mt-4 border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-200" role="alert">{uploadError}</p>}
           {originalImage && <div className="mt-7 space-y-7 border-t border-white/[0.1] pt-7">
             <ImagePreview image={originalImage} />
+            <label className="block"><span className="mb-2 block text-sm font-medium text-zinc-200">作品名称</span><input type="text" value={workTitle} onChange={(event) => setWorkTitle(event.target.value)} maxLength={100} placeholder="为你的作品命名" className="h-10 w-full border border-white/[0.14] bg-[#0b0d1d] px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-cyan-300" /></label>
             <PixelSizeSelector imageWidth={originalImage.width} imageHeight={originalImage.height} value={pixelSize} onChange={handlePixelSizeChange} />
             <div>
               <StartGenerateButton disabled={!sourceFile || processing} isProcessing={processing} onClick={handleStartGenerate} />

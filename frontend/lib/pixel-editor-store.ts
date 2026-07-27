@@ -29,7 +29,7 @@ export interface HistoryRecord {
 
 export interface HistoryCommit { action: Exclude<HistoryAction, "initial">; description: string; }
 
-interface PixelEditorState {
+export interface PixelEditorState {
   gridWidth: number;
   gridHeight: number;
   pixelSize: number;
@@ -43,6 +43,7 @@ interface PixelEditorState {
   sourceWidth: number;
   sourceHeight: number;
   workId: number | null;
+  workTitle: string;
   selectedColor: string;
   tool: EditorTool;
   edgeSoftness: number;
@@ -52,6 +53,7 @@ interface PixelEditorState {
   hoveredPixel: HoveredPixel | null;
   initialize: (gridWidth: number, gridHeight: number, pixelSize: number, canvasWidth: number, canvasHeight: number, cells: PixelCell[], sourceImage: { url: string; width: number; height: number }) => void;
   setWorkId: (workId: number) => void;
+  setWorkTitle: (workTitle: string) => void;
   setSelectedColor: (color: string) => void;
   setTool: (tool: EditorTool) => void;
   setEdgeSoftness: (value: number) => void;
@@ -124,7 +126,7 @@ function compact(records: HistoryRecord[]) {
 }
 
 export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
-  gridWidth: 0, gridHeight: 0, pixelSize: 0, canvasWidth: 0, canvasHeight: 0, pixelGrid: [], pixelSoftness: [], initialPixelGrid: [], pixelOverrides: [], sourceImageUrl: null, sourceWidth: 0, sourceHeight: 0, workId: null,
+  gridWidth: 0, gridHeight: 0, pixelSize: 0, canvasWidth: 0, canvasHeight: 0, pixelGrid: [], pixelSoftness: [], initialPixelGrid: [], pixelOverrides: [], sourceImageUrl: null, sourceWidth: 0, sourceHeight: 0, workId: null, workTitle: "Untitled pixel work",
   selectedColor: "#FF5733", tool: "pencil", edgeSoftness: 0,
   palette: ["#FF5733", "#FF0000", "#00C853", "#2563EB", "#111827", "#FFFFFF"],
   history: [], historyIndex: -1, hoveredPixel: null,
@@ -134,9 +136,10 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
     cells.forEach((cell) => { if (matrix[cell.y]?.[cell.x] !== undefined) matrix[cell.y][cell.x] = cell.color; });
     const softness = createSoftnessMatrix(gridWidth, gridHeight);
     const overrides = createOverrideMatrix(gridWidth, gridHeight);
-    set({ gridWidth, gridHeight, pixelSize, canvasWidth, canvasHeight, pixelGrid: cloneMatrix(matrix), pixelSoftness: cloneSoftnessMatrix(softness), initialPixelGrid: cloneMatrix(matrix), pixelOverrides: cloneOverrideMatrix(overrides), sourceImageUrl: sourceImage.url, sourceWidth: sourceImage.width, sourceHeight: sourceImage.height, workId: null, history: [{ id: 1, action: "initial", description: "初始像素化", timestamp: now(), pixelData: cloneMatrix(matrix), softnessData: cloneSoftnessMatrix(softness), overrideData: cloneOverrideMatrix(overrides) }], historyIndex: 0, hoveredPixel: null });
+    set({ gridWidth, gridHeight, pixelSize, canvasWidth, canvasHeight, pixelGrid: cloneMatrix(matrix), pixelSoftness: cloneSoftnessMatrix(softness), initialPixelGrid: cloneMatrix(matrix), pixelOverrides: cloneOverrideMatrix(overrides), sourceImageUrl: sourceImage.url, sourceWidth: sourceImage.width, sourceHeight: sourceImage.height, workId: null, workTitle: "Untitled pixel work", history: [{ id: 1, action: "initial", description: "初始像素化", timestamp: now(), pixelData: cloneMatrix(matrix), softnessData: cloneSoftnessMatrix(softness), overrideData: cloneOverrideMatrix(overrides) }], historyIndex: 0, hoveredPixel: null });
   },
   setWorkId: (workId) => set({ workId }),
+  setWorkTitle: (workTitle) => set({ workTitle }),
   setSelectedColor: (color) => set({ selectedColor: color.toUpperCase() }),
   setTool: (tool) => set({ tool }),
   setEdgeSoftness: (edgeSoftness) => set({ edgeSoftness: Math.max(0, Math.min(100, edgeSoftness)) }),

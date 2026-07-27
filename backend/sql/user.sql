@@ -18,18 +18,25 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY uk_user_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Application users';
 
-CREATE TABLE IF NOT EXISTS `work` (
+CREATE TABLE IF NOT EXISTS `works` (
   id BIGINT NOT NULL AUTO_INCREMENT,
   user_id BIGINT NOT NULL,
   title VARCHAR(100) NOT NULL,
   pixel_size INT NOT NULL,
   source_image_url VARCHAR(500) DEFAULT NULL COMMENT 'Original uploaded image URL',
+  pixel_image_url VARCHAR(500) DEFAULT NULL COMMENT 'Pixelated image URL',
+  image_width INT NOT NULL,
+  image_height INT NOT NULL,
+  grid_width INT NOT NULL,
+  grid_height INT NOT NULL,
+  canvas_width INT NOT NULL,
+  canvas_height INT NOT NULL,
   pixel_data LONGTEXT NOT NULL COMMENT 'Current complete pixel matrix JSON',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_work_user_id (user_id),
-  CONSTRAINT fk_work_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
+  CONSTRAINT fk_works_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Saved pixel works';
 
 CREATE TABLE IF NOT EXISTS work_history (
@@ -46,7 +53,7 @@ CREATE TABLE IF NOT EXISTS work_history (
   PRIMARY KEY (id),
   UNIQUE KEY uk_work_history_step (work_id, operation_no),
   KEY idx_work_history_user_work (user_id, work_id),
-  CONSTRAINT fk_work_history_work FOREIGN KEY (work_id) REFERENCES `work` (id) ON DELETE CASCADE,
+  CONSTRAINT fk_work_history_work FOREIGN KEY (work_id) REFERENCES `works` (id) ON DELETE CASCADE,
   CONSTRAINT fk_work_history_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Per-user pixel work history';
 

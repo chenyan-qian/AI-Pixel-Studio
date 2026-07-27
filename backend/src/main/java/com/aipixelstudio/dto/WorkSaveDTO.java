@@ -11,6 +11,13 @@ public class WorkSaveDTO {
     private String title;
     @NotNull private Integer size;
     private String sourceImageUrl;
+    private String pixelImageUrl;
+    @NotNull private Integer imageWidth;
+    @NotNull private Integer imageHeight;
+    @NotNull private Integer gridWidth;
+    @NotNull private Integer gridHeight;
+    @NotNull private Integer canvasWidth;
+    @NotNull private Integer canvasHeight;
     @NotNull private JsonNode pixelData;
     @NotNull @Valid private List<HistoryRecordSaveDTO> history;
 
@@ -20,6 +27,20 @@ public class WorkSaveDTO {
     public void setSize(Integer size) { this.size = size; }
     public String getSourceImageUrl() { return sourceImageUrl; }
     public void setSourceImageUrl(String sourceImageUrl) { this.sourceImageUrl = sourceImageUrl; }
+    public String getPixelImageUrl() { return pixelImageUrl; }
+    public void setPixelImageUrl(String pixelImageUrl) { this.pixelImageUrl = pixelImageUrl; }
+    public Integer getImageWidth() { return imageWidth; }
+    public void setImageWidth(Integer imageWidth) { this.imageWidth = imageWidth; }
+    public Integer getImageHeight() { return imageHeight; }
+    public void setImageHeight(Integer imageHeight) { this.imageHeight = imageHeight; }
+    public Integer getGridWidth() { return gridWidth; }
+    public void setGridWidth(Integer gridWidth) { this.gridWidth = gridWidth; }
+    public Integer getGridHeight() { return gridHeight; }
+    public void setGridHeight(Integer gridHeight) { this.gridHeight = gridHeight; }
+    public Integer getCanvasWidth() { return canvasWidth; }
+    public void setCanvasWidth(Integer canvasWidth) { this.canvasWidth = canvasWidth; }
+    public Integer getCanvasHeight() { return canvasHeight; }
+    public void setCanvasHeight(Integer canvasHeight) { this.canvasHeight = canvasHeight; }
     public JsonNode getPixelData() { return pixelData; }
     public void setPixelData(JsonNode pixelData) { this.pixelData = pixelData; }
     public List<HistoryRecordSaveDTO> getHistory() { return history; }

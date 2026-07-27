@@ -11,7 +11,7 @@ const links = [
   { label: "首页", href: "/" },
   { label: "创作", href: "/workspace" },
   { label: "社区", href: "/#community" },
-  { label: "作品", href: "/#works" },
+  { label: "作品", href: "/works" },
 ];
 
 export function Navbar() {
@@ -34,7 +34,7 @@ export function Navbar() {
   const accountMenu = (
     <div className="pixel-corners border border-cyan-200/15 bg-[#12132a]/95 p-1.5 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl" role="menu">
       <Link className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-200 transition hover:bg-white/[0.07] hover:text-white" href="/profile" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><UserRound className="size-4 text-cyan-300" />账户管理</Link>
-      <span className="flex cursor-not-allowed items-center gap-2 px-3 py-2.5 text-sm text-zinc-600" aria-disabled="true"><CircleUserRound className="size-4" />我的作品（即将开放）</span>
+      <Link className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-200 transition hover:bg-white/[0.07] hover:text-white" href="/works" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><CircleUserRound className="size-4 text-cyan-300" />我的作品</Link>
       <span className="flex cursor-not-allowed items-center gap-2 px-3 py-2.5 text-sm text-zinc-600" aria-disabled="true"><Settings className="size-4" />设置（即将开放）</span>
       <div className="my-1 border-t border-white/[0.08]" />
       <button type="button" className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm text-rose-200 transition hover:bg-rose-400/10" onClick={logout} role="menuitem"><LogOut className="size-4" />退出登录</button>
