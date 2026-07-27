@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Download, ImageDown, Save } from "lucide-react";
+import { Download, ImageDown, Save, Send } from "lucide-react";
 import { useState } from "react";
 import CanvasBoard from "@/components/editor/CanvasBoard";
 import ColorPicker from "@/components/editor/ColorPicker";
@@ -40,6 +40,7 @@ export default function PixelEditor() {
   const workId = usePixelEditorStore((state) => state.workId);
   const setWorkId = usePixelEditorStore((state) => state.setWorkId);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
 
@@ -58,7 +59,7 @@ export default function PixelEditor() {
     }
   }
 
-  async function saveWork() {
+  async function saveWork(): Promise<boolean> {
     setSaving(true);
     setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
@@ -71,17 +72,34 @@ export default function PixelEditor() {
       if (response.code !== 200 || !response.data) throw new Error(response.msg || "保存失败");
       setWorkId(response.data.id);
       setSaveMessage("已保存");
+      return true;
     } catch (error) {
       const message = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setSaveMessage(message || (error instanceof Error ? error.message : "保存失败"));
+      return false;
     } finally { setSaving(false); }
+  }
+
+  async function submitForReview() {
+    if (publishing) return;
+    setPublishing(true);
+    const saved = await saveWork();
+    const savedWorkId = usePixelEditorStore.getState().workId;
+    if (!saved || !savedWorkId) { setPublishing(false); return; }
+    try {
+      const response = await request.post(`/api/work/${savedWorkId}/submit`) as unknown as { code: number; msg: string };
+      if (response.code !== 200) throw new Error(response.msg || "提交审核失败");
+      setSaveMessage("已提交管理员审核");
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "提交审核失败");
+    } finally { setPublishing(false); }
   }
 
   return (
     <main className="flex min-h-screen flex-col bg-[#08090d] text-zinc-100">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.1] bg-[#101119] px-4">
         <div className="flex items-center gap-4"><Link href="/workspace" className="text-sm font-semibold text-white">PixelVerse</Link><span className="border-l border-white/[0.12] pl-4 text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px 像素编辑器</span></div>
-        <div className="flex items-center gap-2"><ThemeToggle /><button type="button" onClick={saveWork} disabled={saving} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button><button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
+        <div className="flex items-center gap-2"><ThemeToggle /><button type="button" onClick={saveWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button><button type="button" onClick={submitForReview} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-cyan-400/50 bg-cyan-400/10 px-2.5 text-xs text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-50"><Send className="size-3.5" />{publishing ? "提交中" : "提交发布"}</button><button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
       </header>
       <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[58px_minmax(0,1fr)_280px] lg:grid-rows-1">
         <ToolBar />

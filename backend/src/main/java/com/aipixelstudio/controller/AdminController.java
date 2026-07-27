@@ -3,6 +3,7 @@ package com.aipixelstudio.controller;
 import com.aipixelstudio.common.Result;
 import com.aipixelstudio.dto.AdminStatisticsDTO;
 import com.aipixelstudio.dto.UserStatusDTO;
+import com.aipixelstudio.dto.WorkReviewDTO;
 import com.aipixelstudio.service.AdminService;
 import com.aipixelstudio.vo.AdminArtworkVO;
 import com.aipixelstudio.vo.AdminFileVO;
@@ -39,6 +40,11 @@ public class AdminController {
         adminService.deleteUser(currentUserId(servletRequest), id); return Result.success("用户已删除", null);
     }
     @GetMapping("/artworks") public Result<List<AdminArtworkVO>> artworks() { return Result.success(adminService.artworks()); }
+    @PutMapping("/artwork/{id}/review")
+    public Result<Void> reviewArtwork(@PathVariable Long id, @Valid @RequestBody WorkReviewDTO request, HttpServletRequest servletRequest) {
+        adminService.reviewArtwork(currentUserId(servletRequest), id, request.getApproved(), request.getReviewNote());
+        return Result.success(null);
+    }
     @DeleteMapping("/artwork/{id}")
     public Result<Void> deleteArtwork(@PathVariable Long id, HttpServletRequest servletRequest) {
         adminService.deleteArtwork(currentUserId(servletRequest), id); return Result.success("作品已删除", null);

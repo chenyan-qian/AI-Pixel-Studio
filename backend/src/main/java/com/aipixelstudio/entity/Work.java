@@ -23,6 +23,11 @@ public class Work {
     private Integer canvasWidth;
     private Integer canvasHeight;
     private String pixelData;
+    private String reviewStatus;
+    private String reviewNote;
+    private Long reviewerId;
+    private LocalDateTime reviewedTime;
+    private LocalDateTime publishedTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -52,6 +57,16 @@ public class Work {
     public void setCanvasHeight(Integer canvasHeight) { this.canvasHeight = canvasHeight; }
     public String getPixelData() { return pixelData; }
     public void setPixelData(String pixelData) { this.pixelData = pixelData; }
+    public String getReviewStatus() { return reviewStatus; }
+    public void setReviewStatus(String reviewStatus) { this.reviewStatus = reviewStatus; }
+    public String getReviewNote() { return reviewNote; }
+    public void setReviewNote(String reviewNote) { this.reviewNote = reviewNote; }
+    public Long getReviewerId() { return reviewerId; }
+    public void setReviewerId(Long reviewerId) { this.reviewerId = reviewerId; }
+    public LocalDateTime getReviewedTime() { return reviewedTime; }
+    public void setReviewedTime(LocalDateTime reviewedTime) { this.reviewedTime = reviewedTime; }
+    public LocalDateTime getPublishedTime() { return publishedTime; }
+    public void setPublishedTime(LocalDateTime publishedTime) { this.publishedTime = publishedTime; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }

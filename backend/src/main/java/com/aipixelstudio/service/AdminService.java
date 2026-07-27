@@ -13,6 +13,7 @@ public interface AdminService {
     void updateUserStatus(Long adminId, Long userId, Integer status);
     void deleteUser(Long adminId, Long userId);
     List<AdminArtworkVO> artworks();
+    void reviewArtwork(Long adminId, Long artworkId, boolean approved, String reviewNote);
     void deleteArtwork(Long adminId, Long artworkId);
     List<AdminFileVO> files();
     void deleteFile(Long adminId, Long fileId);

@@ -39,6 +39,12 @@ public class WorkController {
         return Result.success(workService.save(currentUserId(servletRequest), workId, request));
     }
 
+    @PostMapping("/{workId}/submit")
+    public Result<Void> submit(@PathVariable Long workId, HttpServletRequest servletRequest) {
+        workService.submitForReview(currentUserId(servletRequest), workId);
+        return Result.success(null);
+    }
+
     @GetMapping("/my")
     public Result<List<Work>> my(HttpServletRequest servletRequest) {
         return Result.success(workService.myWorks(currentUserId(servletRequest)));

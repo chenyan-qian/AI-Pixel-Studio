@@ -1,4 +1,6 @@
 package com.aipixelstudio.vo;
 import java.time.LocalDateTime;
 /** Existing works store pixel matrices rather than rendered image URLs. */
-public record AdminArtworkVO(Long id, Long userId, String username, String title, Integer pixelSize, String sourceImageUrl, String finalPixelData, LocalDateTime createTime, LocalDateTime updateTime) { }
+public record AdminArtworkVO(Long id, Long userId, String username, String title, Integer pixelSize, String sourceImageUrl,
+                             String pixelImageUrl, String reviewStatus, String reviewNote, LocalDateTime publishedTime,
+                             String finalPixelData, LocalDateTime createTime, LocalDateTime updateTime) { }

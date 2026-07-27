@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertTriangle, FolderOpen, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, FolderOpen, Plus, Send, Trash2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
@@ -17,6 +17,7 @@ export default function WorksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [removing, setRemoving] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<WorkRecord | null>(null);
 
   useEffect(() => {
@@ -44,6 +45,25 @@ export default function WorksPage() {
     } finally { setRemoving(null); }
   }
 
+  async function submitWork(work: WorkRecord) {
+    setSubmitting(work.id);
+    setError("");
+    try {
+      const response = await request.post(`/api/work/${work.id}/submit`) as unknown as ApiResponse<null>;
+      if (response.code !== 200) throw new Error(response.msg || "提交审核失败");
+      setWorks((current) => current.map((item) => item.id === work.id ? { ...item, reviewStatus: "PENDING", reviewNote: null } : item));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "提交审核失败");
+    } finally { setSubmitting(null); }
+  }
+
+  function reviewStatus(work: WorkRecord) {
+    if (work.reviewStatus === "PUBLISHED") return <span className="inline-flex items-center gap-1 text-emerald-300"><CheckCircle2 className="size-3.5" />已发布</span>;
+    if (work.reviewStatus === "PENDING") return <span className="inline-flex items-center gap-1 text-amber-300"><Clock3 className="size-3.5" />审核中</span>;
+    if (work.reviewStatus === "REJECTED") return <span className="inline-flex items-center gap-1 text-rose-300"><XCircle className="size-3.5" />未通过</span>;
+    return <span className="text-zinc-500">未提交</span>;
+  }
+
   return (
     <main className="grid-background min-h-screen bg-[#08090d] px-5 pb-16 pt-28 text-zinc-100 sm:px-8">
       <Navbar />
@@ -57,9 +77,9 @@ export default function WorksPage() {
           {works.map((work) => <article key={work.id} className="group overflow-hidden border border-white/[0.12] bg-[#10111a]/90 shadow-xl shadow-black/10">
             <Link href={`/editor?workId=${work.id}`} className="block">
               <div className="aspect-[4/3] bg-[#161827]">{absoluteImageUrl(work.pixelImageUrl || work.sourceImageUrl) ? <img src={absoluteImageUrl(work.pixelImageUrl || work.sourceImageUrl)!} alt="" className="size-full object-cover [image-rendering:pixelated]" /> : null}</div>
-              <div className="p-4"><h2 className="truncate text-base font-semibold text-white">{work.title}</h2><p className="mt-2 text-xs text-zinc-500">{work.imageWidth} x {work.imageHeight} · {work.pixelSize}px</p><p className="mt-1 text-xs text-zinc-600">更新于 {new Date(work.updateTime).toLocaleString("zh-CN")}</p></div>
+              <div className="p-4"><div className="flex items-center justify-between gap-2"><h2 className="truncate text-base font-semibold text-white">{work.title}</h2><span className="shrink-0 text-xs">{reviewStatus(work)}</span></div><p className="mt-2 text-xs text-zinc-500">{work.imageWidth} x {work.imageHeight} · {work.pixelSize}px</p>{work.reviewStatus === "REJECTED" && work.reviewNote && <p className="mt-2 text-xs text-rose-300">审核意见：{work.reviewNote}</p>}<p className="mt-1 text-xs text-zinc-600">更新于 {new Date(work.updateTime).toLocaleString("zh-CN")}</p></div>
             </Link>
-            <div className="flex justify-end border-t border-white/[0.08] px-3 py-2"><button type="button" title="删除作品" aria-label="删除作品" onClick={() => setPendingDelete(work)} disabled={removing === work.id} className="grid size-8 place-items-center text-zinc-500 hover:bg-rose-400/10 hover:text-rose-200 disabled:opacity-50"><Trash2 className="size-4" /></button></div>
+            <div className="flex justify-end gap-1 border-t border-white/[0.08] px-3 py-2">{(work.reviewStatus === "DRAFT" || work.reviewStatus === "REJECTED") && <button type="button" title="提交审核" aria-label="提交审核" onClick={() => submitWork(work)} disabled={submitting === work.id} className="grid size-8 place-items-center text-cyan-300 hover:bg-cyan-400/10 disabled:opacity-50"><Send className="size-4" /></button>}<button type="button" title="删除作品" aria-label="删除作品" onClick={() => setPendingDelete(work)} disabled={removing === work.id} className="grid size-8 place-items-center text-zinc-500 hover:bg-rose-400/10 hover:text-rose-200 disabled:opacity-50"><Trash2 className="size-4" /></button></div>
           </article>)}
         </div>}
       </section>

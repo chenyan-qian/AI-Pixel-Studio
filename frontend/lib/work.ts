@@ -13,8 +13,22 @@ export interface WorkRecord {
   canvasWidth: number;
   canvasHeight: number;
   pixelData: string;
+  reviewStatus: "DRAFT" | "PENDING" | "PUBLISHED" | "REJECTED";
+  reviewNote: string | null;
+  publishedTime: string | null;
   createTime: string;
   updateTime: string;
+}
+
+export interface CommunityWork {
+  id: number;
+  title: string;
+  sourceImageUrl: string | null;
+  pixelImageUrl: string | null;
+  pixelSize: number;
+  imageWidth: number;
+  imageHeight: number;
+  publishedTime: string | null;
 }
 
 export function buildWorkPayload(state: PixelEditorState, title = state.workTitle || "Untitled pixel work") {
@@ -51,7 +65,7 @@ export function buildWorkPayload(state: PixelEditorState, title = state.workTitl
   };
 }
 
-export function absoluteImageUrl(url: string | null) {
+export function absoluteImageUrl(url?: string | null) {
   if (!url || url.startsWith("http")) return url;
   return `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"}${url}`;
 }

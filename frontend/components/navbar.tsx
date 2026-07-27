@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const links = [
   { label: "首页", href: "/" },
   { label: "创作", href: "/workspace" },
-  { label: "社区", href: "/#community" },
+  { label: "社区", href: "/community" },
   { label: "作品", href: "/works" },
 ];
 

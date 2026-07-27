@@ -87,8 +87,25 @@ public class AdminServiceImpl implements AdminService {
         Map<Long, String> usernames = usernames();
         return workMapper.selectList(Wrappers.<Work>lambdaQuery().orderByDesc(Work::getCreateTime)).stream()
                 .map(work -> new AdminArtworkVO(work.getId(), work.getUserId(), usernames.getOrDefault(work.getUserId(), "已删除用户"),
-                        work.getTitle(), work.getPixelSize(), work.getSourceImageUrl(), work.getPixelData(), work.getCreateTime(), work.getUpdateTime()))
+                        work.getTitle(), work.getPixelSize(), work.getSourceImageUrl(), work.getPixelImageUrl(),
+                        work.getReviewStatus(), work.getReviewNote(), work.getPublishedTime(), work.getPixelData(), work.getCreateTime(), work.getUpdateTime()))
                 .toList();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void reviewArtwork(Long adminId, Long artworkId, boolean approved, String reviewNote) {
+        Work work = workMapper.selectById(artworkId);
+        if (work == null) throw new IllegalArgumentException("Work not found");
+        if (!"PENDING".equals(work.getReviewStatus())) throw new IllegalArgumentException("Work is not pending review");
+        work.setReviewStatus(approved ? "PUBLISHED" : "REJECTED");
+        work.setReviewNote(reviewNote == null || reviewNote.isBlank() ? null : reviewNote.trim());
+        work.setReviewerId(adminId);
+        work.setReviewedTime(LocalDateTime.now());
+        work.setPublishedTime(approved ? LocalDateTime.now() : null);
+        work.setUpdateTime(LocalDateTime.now());
+        workMapper.updateById(work);
+        recordOperation(adminId, (approved ? "Approved work: " : "Rejected work: ") + work.getTitle() + " (ID=" + artworkId + ")");
     }
 
     @Override

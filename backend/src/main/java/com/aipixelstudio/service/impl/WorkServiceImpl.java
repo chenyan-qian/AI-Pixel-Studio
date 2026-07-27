@@ -52,8 +52,17 @@ public class WorkServiceImpl implements WorkService {
             work = new Work();
             work.setUserId(userId);
             work.setCreateTime(LocalDateTime.now());
+            work.setReviewStatus("DRAFT");
         } else {
             work = findOwnedWork(userId, workId);
+            // Any saved edit invalidates a prior review decision and must be reviewed again.
+            if ("PUBLISHED".equals(work.getReviewStatus()) || "PENDING".equals(work.getReviewStatus())) {
+                work.setReviewStatus("DRAFT");
+                work.setReviewNote(null);
+                work.setReviewerId(null);
+                work.setReviewedTime(null);
+                work.setPublishedTime(null);
+            }
         }
         work.setTitle(request.getTitle() == null || request.getTitle().isBlank() ? "未命名像素作品" : request.getTitle().trim());
         work.setPixelSize(request.getSize());
@@ -100,6 +109,27 @@ public class WorkServiceImpl implements WorkService {
         return workMapper.selectList(Wrappers.<Work>lambdaQuery()
                 .eq(Work::getUserId, userId)
                 .orderByDesc(Work::getUpdateTime));
+    }
+
+    @Override
+    @Transactional
+    public void submitForReview(Long userId, Long workId) {
+        Work work = findOwnedWork(userId, workId);
+        if ("PENDING".equals(work.getReviewStatus())) throw new IllegalArgumentException("Work is already pending review");
+        work.setReviewStatus("PENDING");
+        work.setReviewNote(null);
+        work.setReviewerId(null);
+        work.setReviewedTime(null);
+        work.setPublishedTime(null);
+        work.setUpdateTime(LocalDateTime.now());
+        workMapper.updateById(work);
+    }
+
+    @Override
+    public List<Work> publishedWorks() {
+        return workMapper.selectList(Wrappers.<Work>lambdaQuery()
+                .eq(Work::getReviewStatus, "PUBLISHED")
+                .orderByDesc(Work::getPublishedTime));
     }
 
     @Override

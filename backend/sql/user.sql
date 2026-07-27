@@ -32,10 +32,16 @@ CREATE TABLE IF NOT EXISTS `works` (
   canvas_width INT NOT NULL,
   canvas_height INT NOT NULL,
   pixel_data LONGTEXT NOT NULL COMMENT 'Current complete pixel matrix JSON',
+  review_status VARCHAR(16) NOT NULL DEFAULT 'DRAFT' COMMENT 'DRAFT, PENDING, PUBLISHED, REJECTED',
+  review_note VARCHAR(500) DEFAULT NULL,
+  reviewer_id BIGINT DEFAULT NULL,
+  reviewed_time DATETIME DEFAULT NULL,
+  published_time DATETIME DEFAULT NULL,
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_work_user_id (user_id),
+  KEY idx_works_review_published (review_status, published_time),
   CONSTRAINT fk_works_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Saved pixel works';
 

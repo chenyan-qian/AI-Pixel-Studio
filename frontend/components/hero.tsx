@@ -21,7 +21,7 @@ export function Hero() {
           <p className="animate-rise animation-delay-200 mt-6 max-w-xl text-base leading-8 text-zinc-400 sm:text-lg">将图片转化为独特的像素艺术，<br className="hidden sm:block" />并与其他创作者共同探索无限可能。</p>
           <div className="animate-rise animation-delay-200 mt-9 flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={openWorkspace} className="glow-button inline-flex h-12 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold text-white"><ImagePlus className="size-4" />开始创作<ArrowRight className="size-4" /></button>
-            <a href="#works" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/[0.15] bg-white/[0.04] px-6 text-sm font-medium text-zinc-200 transition hover:border-cyan-200/35 hover:bg-cyan-200/[0.07] hover:text-white"><Sparkles className="size-4 text-cyan-200" />浏览作品</a>
+            <a href="/community" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/[0.15] bg-white/[0.04] px-6 text-sm font-medium text-zinc-200 transition hover:border-cyan-200/35 hover:bg-cyan-200/[0.07] hover:text-white"><Sparkles className="size-4 text-cyan-200" />浏览作品</a>
           </div>
           <p className="mt-7 text-xs text-zinc-500">创造属于你的像素世界</p>
         </div>
