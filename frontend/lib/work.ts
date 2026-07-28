@@ -23,12 +23,15 @@ export interface WorkRecord {
 export interface CommunityWork {
   id: number;
   title: string;
-  sourceImageUrl: string | null;
-  pixelImageUrl: string | null;
+  imageUrl: string | null;
+  username: string;
+  avatar: string | null;
   pixelSize: number;
-  imageWidth: number;
-  imageHeight: number;
-  publishedTime: string | null;
+  width: number;
+  height: number;
+  likeCount: number;
+  commentCount: number;
+  createTime: string | null;
 }
 
 export function buildWorkPayload(state: PixelEditorState, title = state.workTitle || "Untitled pixel work") {

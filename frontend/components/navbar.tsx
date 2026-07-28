@@ -32,30 +32,30 @@ export function Navbar() {
   }
 
   const accountMenu = (
-    <div className="pixel-corners border border-cyan-200/15 bg-[#12132a]/95 p-1.5 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl" role="menu">
-      <Link className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-200 transition hover:bg-white/[0.07] hover:text-white" href="/profile" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><UserRound className="size-4 text-cyan-300" />账户管理</Link>
-      <Link className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-200 transition hover:bg-white/[0.07] hover:text-white" href="/works" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><CircleUserRound className="size-4 text-cyan-300" />我的作品</Link>
-      <span className="flex cursor-not-allowed items-center gap-2 px-3 py-2.5 text-sm text-zinc-600" aria-disabled="true"><Settings className="size-4" />设置（即将开放）</span>
-      <div className="my-1 border-t border-white/[0.08]" />
-      <button type="button" className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm text-rose-200 transition hover:bg-rose-400/10" onClick={logout} role="menuitem"><LogOut className="size-4" />退出登录</button>
+    <div className="theme-menu pixel-corners border p-1.5 shadow-2xl backdrop-blur-xl" role="menu">
+      <Link className="theme-nav-link flex items-center gap-2 rounded-md px-3 py-2.5 text-sm transition" href="/profile" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><UserRound className="theme-accent size-4" />账户管理</Link>
+      <Link className="theme-nav-link flex items-center gap-2 rounded-md px-3 py-2.5 text-sm transition" href="/works" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><CircleUserRound className="theme-accent size-4" />我的作品</Link>
+      <span className="theme-text-tertiary flex cursor-not-allowed items-center gap-2 px-3 py-2.5 text-sm" aria-disabled="true"><Settings className="size-4" />设置（即将开放）</span>
+      <div className="theme-divider my-1 border-t" />
+      <button type="button" className="theme-error flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm transition" onClick={logout} role="menuitem"><LogOut className="size-4" />退出登录</button>
     </div>
   );
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-5">
-      <nav className="mx-auto flex h-[66px] max-w-6xl items-center justify-between border border-white/[0.11] bg-[#101120]/80 px-4 shadow-xl shadow-black/20 backdrop-blur-xl sm:px-5">
+      <nav className="theme-nav mx-auto flex h-[66px] max-w-6xl items-center justify-between border px-4 shadow-xl backdrop-blur-xl sm:px-5">
         <Link className="flex min-w-0 items-center gap-2.5" href="/" aria-label="PixelVerse 首页">
-          <span className="grid size-9 shrink-0 place-items-center rounded-md border border-cyan-200/30 bg-gradient-to-br from-violet-500 via-blue-500 to-cyan-400 text-white shadow-lg shadow-cyan-500/20"><Sparkles className="size-4" strokeWidth={2.5} /></span>
-          <span className="min-w-0"><span className="block text-sm font-bold tracking-wide text-white">PixelVerse</span><span className="hidden text-[10px] text-cyan-200/75 sm:block">Create Your Pixel World</span></span>
+          <span className="theme-avatar grid size-9 shrink-0 place-items-center rounded-md border shadow-lg"><Sparkles className="size-4" strokeWidth={2.5} /></span>
+          <span className="min-w-0"><span className="theme-text-primary block text-sm font-bold tracking-wide">PixelVerse</span><span className="theme-accent hidden text-[10px] sm:block">Create Your Pixel World</span></span>
         </Link>
-        <div className="hidden items-center gap-1 md:flex">{links.map((link) => <Link className="rounded-md px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-white/[0.06] hover:text-cyan-100" href={link.href} key={link.href}>{link.label}</Link>)}</div>
+        <div className="hidden items-center gap-1 md:flex">{links.map((link) => <Link className="theme-nav-link rounded-md px-3 py-2 text-sm transition-colors" href={link.href} key={link.href}>{link.label}</Link>)}</div>
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          {user ? <div className="relative"><button type="button" className="flex h-9 items-center gap-2 rounded-md border border-cyan-200/20 bg-white/[0.03] px-3 text-sm text-zinc-200 transition hover:border-cyan-300/50 hover:text-white" onClick={() => setAccountOpen((open) => !open)} aria-expanded={accountOpen} aria-haspopup="menu"><UserRound className="size-4 text-cyan-300" />{user.nickname || user.username}<ChevronDown className={`size-3.5 transition ${accountOpen ? "rotate-180" : ""}`} /></button>{accountOpen && <div className="absolute right-0 top-11 z-20 w-52">{accountMenu}</div>}</div> : <><Link className="flex h-9 items-center rounded-md px-4 text-sm text-zinc-300 transition-colors hover:text-white" href="/login">登录</Link><Link className="glow-button flex h-9 items-center rounded-md px-4 text-sm font-medium text-white" href="/register">注册</Link></>}
+          {user ? <div className="relative"><button type="button" className="theme-account-button flex h-9 items-center gap-2 rounded-md border px-3 text-sm transition" onClick={() => setAccountOpen((open) => !open)} aria-expanded={accountOpen} aria-haspopup="menu"><UserRound className="theme-accent size-4" />{user.nickname || user.username}<ChevronDown className={`size-3.5 transition ${accountOpen ? "rotate-180" : ""}`} /></button>{accountOpen && <div className="absolute right-0 top-11 z-20 w-52">{accountMenu}</div>}</div> : <><Link className="theme-nav-link flex h-9 items-center rounded-md px-4 text-sm transition-colors" href="/login">登录</Link><Link className="glow-button flex h-9 items-center rounded-md px-4 text-sm font-medium" href="/register">注册</Link></>}
         </div>
-        <button type="button" className="grid size-9 place-items-center rounded-md text-zinc-300 hover:bg-white/[0.06] md:hidden" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "关闭导航" : "打开导航"}>{menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}</button>
+        <button type="button" className="theme-nav-link grid size-9 place-items-center rounded-md md:hidden" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "关闭导航" : "打开导航"}>{menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}</button>
       </nav>
-      {menuOpen && <div className="pixel-corners mx-auto max-w-6xl border-x border-b border-white/[0.1] bg-[#101120]/95 p-3 shadow-xl shadow-black/20 backdrop-blur-xl md:hidden"><div className="flex flex-col gap-1">{links.map((link) => <Link className="rounded-md px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.05] hover:text-white" href={link.href} key={link.href} onClick={() => setMenuOpen(false)}>{link.label}</Link>)}{user ? <div className="mt-2 border-t border-white/[0.08] pt-3">{accountMenu}</div> : <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-3"><Link className="flex h-10 items-center justify-center rounded-md border border-white/[0.12] text-sm text-zinc-200" href="/login" onClick={() => setMenuOpen(false)}>登录</Link><Link className="glow-button flex h-10 items-center justify-center rounded-md text-sm font-medium text-white" href="/register" onClick={() => setMenuOpen(false)}>注册</Link></div>}</div></div>}
+      {menuOpen && <div className="theme-menu pixel-corners mx-auto max-w-6xl border-x border-b p-3 shadow-xl backdrop-blur-xl md:hidden"><div className="flex flex-col gap-1">{links.map((link) => <Link className="theme-nav-link rounded-md px-3 py-2.5 text-sm" href={link.href} key={link.href} onClick={() => setMenuOpen(false)}>{link.label}</Link>)}{user ? <div className="theme-divider mt-2 border-t pt-3">{accountMenu}</div> : <div className="theme-divider mt-2 grid grid-cols-2 gap-2 border-t pt-3"><Link className="theme-nav-link flex h-10 items-center justify-center rounded-md border" href="/login" onClick={() => setMenuOpen(false)}>登录</Link><Link className="glow-button flex h-10 items-center justify-center rounded-md text-sm font-medium" href="/register" onClick={() => setMenuOpen(false)}>注册</Link></div>}</div></div>}
     </header>
   );
 }
