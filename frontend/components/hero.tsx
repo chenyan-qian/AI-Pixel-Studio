@@ -4,7 +4,12 @@ import { ArrowRight, ImagePlus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getToken, getUser } from "@/lib/auth";
 
-const pixels = ["#6d5dfc", "#33d7ff", "#8f6bff", "#30e6c4", "#1d2b64", "#f7b267", "#5f4bb6", "#c4f0ff", "#3f51b5", "#30e6c4", "#f25f9c", "#6d5dfc", "#22305d", "#75d6ff", "#8f6bff", "#f7b267"];
+const pixels = [
+  { id: "hero-pixel-01", color: "#6d5dfc" }, { id: "hero-pixel-02", color: "#33d7ff" }, { id: "hero-pixel-03", color: "#8f6bff" }, { id: "hero-pixel-04", color: "#30e6c4" },
+  { id: "hero-pixel-05", color: "#1d2b64" }, { id: "hero-pixel-06", color: "#f7b267" }, { id: "hero-pixel-07", color: "#5f4bb6" }, { id: "hero-pixel-08", color: "#c4f0ff" },
+  { id: "hero-pixel-09", color: "#3f51b5" }, { id: "hero-pixel-10", color: "#30e6c4" }, { id: "hero-pixel-11", color: "#f25f9c" }, { id: "hero-pixel-12", color: "#6d5dfc" },
+  { id: "hero-pixel-13", color: "#22305d" }, { id: "hero-pixel-14", color: "#75d6ff" }, { id: "hero-pixel-15", color: "#8f6bff" }, { id: "hero-pixel-16", color: "#f7b267" },
+];
 
 export function Hero() {
   const router = useRouter();
@@ -30,7 +35,7 @@ export function Hero() {
           <div className="pixel-corners relative overflow-hidden border border-cyan-200/20 bg-[#111329]/75 p-3 shadow-2xl shadow-violet-950/50 backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-white/[0.1] px-2 pb-3 text-xs text-zinc-400"><span className="flex items-center gap-2"><span className="size-2 bg-cyan-300" />LIVE CANVAS</span><span className="text-cyan-200">12,846 pixels</span></div>
             <div className="mt-3 grid aspect-square grid-cols-4 gap-1.5 bg-[#0d0d1d] p-3 sm:gap-2 sm:p-5">
-              {pixels.map((color, index) => <span key={`${color}-${index}`} className="pixel-tile" style={{ backgroundColor: color, animationDelay: `${index * 90}ms` }} />)}
+              {pixels.map((pixel, position) => <span key={pixel.id} className="pixel-tile" style={{ backgroundColor: pixel.color, animationDelay: `${position * 90}ms` }} />)}
             </div>
             <div className="mt-3 flex items-center justify-between px-2 pb-1 text-xs"><span className="text-zinc-500">Creative space / 01</span><span className="font-medium text-violet-200">PixelVerse</span></div>
           </div>

@@ -14,5 +14,8 @@ public record CommunityWorkVO(
         Integer height,
         long likeCount,
         long commentCount,
-        LocalDateTime createTime
+        LocalDateTime createTime,
+        boolean collaborationEnabled,
+        int onlineCount,
+        long modificationCount
 ) { }

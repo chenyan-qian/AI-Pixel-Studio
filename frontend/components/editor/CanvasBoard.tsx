@@ -4,6 +4,7 @@ import { Maximize, Minus, Plus } from "lucide-react";
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fillMatrix, getConnectedPixelBlocks, getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import { useTheme } from "@/context/ThemeContext";
+import { emitLocalPixelChanges } from "@/lib/collaboration";
 
 const ZOOM_LEVELS = Array.from({ length: 32 }, (_, index) => (index + 1) * 25);
 const MIN_ZOOM = 1;
@@ -341,6 +342,7 @@ export default function CanvasBoard() {
         const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) ? edgeSoftness : softness));
         const nextOverrides = pixelOverrides.map((row, rowIndex) => row.map((overridden, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) || overridden));
         commitPixelGrid(next, nextSoftness, nextOverrides, { action: "fill", description: `Fill with ${selectedColor}` });
+        emitLocalPixelChanges(connectedBlocks.map(({ row, col }) => ({ x: col, y: row, color: next[row][col], softness: nextSoftness[row][col], overridden: nextOverrides[row][col] })));
       }
       return;
     }
@@ -383,6 +385,7 @@ export default function CanvasBoard() {
       const color = tool === "eraser" ? "初始颜色" : selectedColor;
       const description = cells.length === 1 && first ? `${action}坐标(${first.x},${first.y})像素颜色为${color}` : `${action}${cells.length}个像素颜色为${color}`;
       commitPixelGrid(draftRef.current, draftSoftnessRef.current, draftOverridesRef.current, { action: "pixel_change", description });
+      emitLocalPixelChanges(cells.map(({ x, y }) => ({ x, y, color: draftRef.current![y][x], softness: draftSoftnessRef.current![y][x], overridden: draftOverridesRef.current![y][x] })));
     }
     drawingRef.current = false;
     changedRef.current = false;

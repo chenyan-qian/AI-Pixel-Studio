@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Clock3, FolderOpen, Plus, Send, Trash2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, FolderOpen, PencilLine, Plus, Send, Trash2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
@@ -19,6 +19,7 @@ export default function WorksPage() {
   const [removing, setRemoving] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<WorkRecord | null>(null);
+  const [enablingCollaboration, setEnablingCollaboration] = useState<number | null>(null);
 
   useEffect(() => {
     if (!getToken() || !getUser()) { clearSession(); router.replace("/login"); return; }
@@ -57,6 +58,17 @@ export default function WorksPage() {
     } finally { setSubmitting(null); }
   }
 
+  async function enableCollaboration(work: WorkRecord) {
+    setEnablingCollaboration(work.id);
+    setError("");
+    try {
+      const response = await request.put(`/api/work/${work.id}/permission`, { visibility: "PUBLIC_COLLAB", allowEdit: true, allowComment: true, allowFork: true }) as unknown as ApiResponse<unknown>;
+      if (response.code !== 200) throw new Error(response.msg || "开启协作失败");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "开启协作失败");
+    } finally { setEnablingCollaboration(null); }
+  }
+
   function reviewStatus(work: WorkRecord) {
     if (work.reviewStatus === "PUBLISHED") return <span className="inline-flex items-center gap-1 text-emerald-300"><CheckCircle2 className="size-3.5" />已发布</span>;
     if (work.reviewStatus === "PENDING") return <span className="inline-flex items-center gap-1 text-amber-300"><Clock3 className="size-3.5" />审核中</span>;
@@ -79,6 +91,7 @@ export default function WorksPage() {
               <div className="aspect-[4/3] bg-[#161827]">{absoluteImageUrl(work.pixelImageUrl || work.sourceImageUrl) ? <img src={absoluteImageUrl(work.pixelImageUrl || work.sourceImageUrl)!} alt="" className="size-full object-cover [image-rendering:pixelated]" /> : null}</div>
               <div className="p-4"><div className="flex items-center justify-between gap-2"><h2 className="truncate text-base font-semibold text-white">{work.title}</h2><span className="shrink-0 text-xs">{reviewStatus(work)}</span></div><p className="mt-2 text-xs text-zinc-500">{work.imageWidth} x {work.imageHeight} · {work.pixelSize}px</p>{work.reviewStatus === "REJECTED" && work.reviewNote && <p className="mt-2 text-xs text-rose-300">审核意见：{work.reviewNote}</p>}<p className="mt-1 text-xs text-zinc-600">更新于 {new Date(work.updateTime).toLocaleString("zh-CN")}</p></div>
             </Link>
+            {work.reviewStatus === "PUBLISHED" && <div className="border-t border-white/[0.08] px-3 py-2"><button type="button" onClick={() => enableCollaboration(work)} disabled={enablingCollaboration === work.id} className="inline-flex h-8 items-center gap-1.5 border border-cyan-400/40 px-2.5 text-xs text-cyan-200 hover:bg-cyan-400/10 disabled:opacity-50"><PencilLine className="size-3.5" />{enablingCollaboration === work.id ? "正在开启..." : "开启多人协作"}</button></div>}
             <div className="flex justify-end gap-1 border-t border-white/[0.08] px-3 py-2">{(work.reviewStatus === "DRAFT" || work.reviewStatus === "REJECTED") && <button type="button" title="提交审核" aria-label="提交审核" onClick={() => submitWork(work)} disabled={submitting === work.id} className="grid size-8 place-items-center text-cyan-300 hover:bg-cyan-400/10 disabled:opacity-50"><Send className="size-4" /></button>}<button type="button" title="删除作品" aria-label="删除作品" onClick={() => setPendingDelete(work)} disabled={removing === work.id} className="grid size-8 place-items-center text-zinc-500 hover:bg-rose-400/10 hover:text-rose-200 disabled:opacity-50"><Trash2 className="size-4" /></button></div>
           </article>)}
         </div>}

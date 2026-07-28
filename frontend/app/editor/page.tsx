@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PixelEditor from "@/components/editor/PixelEditor";
 import { clearSession, getToken, getUser } from "@/lib/auth";
-import { usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { normalizePalette, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import type { WorkRecord } from "@/lib/work";
 
@@ -36,7 +36,7 @@ export default function EditorPage() {
         initialPixelGrid: (history[0]?.pixelData || saved.pixelGrid) as string[][],
         sourceImageUrl: result.data.sourceImageUrl, sourceWidth: result.data.imageWidth, sourceHeight: result.data.imageHeight,
         workId: result.data.id, workTitle: result.data.title, history, historyIndex: typeof saved.historyIndex === "number" ? saved.historyIndex : history.length - 1,
-        palette: Array.isArray(saved.palette) ? saved.palette as string[] : usePixelEditorStore.getState().palette,
+        palette: Array.isArray(saved.palette) ? normalizePalette(saved.palette as string[]) : usePixelEditorStore.getState().palette,
         selectedColor: typeof saved.selectedColor === "string" ? saved.selectedColor : "#FF5733",
         edgeSoftness: typeof saved.edgeSoftness === "number" ? saved.edgeSoftness : 0, hoveredPixel: null,
       });

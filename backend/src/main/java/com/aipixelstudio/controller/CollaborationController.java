@@ -1,0 +1,30 @@
+package com.aipixelstudio.controller;
+
+import com.aipixelstudio.common.Result;
+import com.aipixelstudio.dto.CollaborationVersionDTO;
+import com.aipixelstudio.entity.ArtworkVersion;
+import com.aipixelstudio.service.CollaborationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/collaboration")
+public class CollaborationController {
+    private final CollaborationService collaborationService;
+    public CollaborationController(CollaborationService collaborationService) { this.collaborationService = collaborationService; }
+    @GetMapping("/{artworkId}/versions") public Result<List<ArtworkVersion>> versions(@PathVariable Long artworkId) { return Result.success(collaborationService.versions(artworkId)); }
+    @PostMapping("/{artworkId}/versions") public Result<ArtworkVersion> saveVersion(@PathVariable Long artworkId, @Valid @RequestBody CollaborationVersionDTO payload, HttpServletRequest request) {
+        return Result.success(collaborationService.saveVersion(artworkId, userId(request), payload.getSnapshot(), payload.getDescription()));
+    }
+    @PostMapping("/{artworkId}/versions/{versionNumber}/restore") public Result<ArtworkVersion> restore(@PathVariable Long artworkId, @PathVariable Long versionNumber, HttpServletRequest request) {
+        return Result.success(collaborationService.restoreVersion(artworkId, versionNumber, userId(request)));
+    }
+    private Long userId(HttpServletRequest request) { return (Long) request.getAttribute("userId"); }
+}

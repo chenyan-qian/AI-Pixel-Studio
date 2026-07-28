@@ -69,6 +69,9 @@ export interface PixelEditorState {
 function cloneMatrix(matrix: PixelMatrix) { return matrix.map((row) => [...row]); }
 function cloneSoftnessMatrix(matrix: SoftnessMatrix) { return matrix.map((row) => [...row]); }
 function cloneOverrideMatrix(matrix: PixelOverrideMatrix) { return matrix.map((row) => [...row]); }
+export function normalizePalette(colors: readonly string[]) {
+  return [...new Set(colors.map((color) => color.trim().toUpperCase()).filter((color) => /^#[0-9A-F]{6}$/.test(color)))];
+}
 function createTransparentMatrix(width: number, height: number): PixelMatrix { return Array.from({ length: height }, () => Array.from({ length: width }, () => TRANSPARENT)); }
 function createSoftnessMatrix(width: number, height: number, value = 0): SoftnessMatrix { return Array.from({ length: height }, () => Array.from({ length: width }, () => value)); }
 function createOverrideMatrix(width: number, height: number, value = false): PixelOverrideMatrix { return Array.from({ length: height }, () => Array.from({ length: width }, () => value)); }
@@ -143,7 +146,7 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
   setSelectedColor: (color) => set({ selectedColor: color.toUpperCase() }),
   setTool: (tool) => set({ tool }),
   setEdgeSoftness: (edgeSoftness) => set({ edgeSoftness: Math.max(0, Math.min(100, edgeSoftness)) }),
-  addPaletteColor: (color) => { const nextColor = (color || get().selectedColor).toUpperCase(); set((state) => state.palette.includes(nextColor) ? state : { palette: [...state.palette, nextColor] }); },
+  addPaletteColor: (color) => { const nextColor = (color || get().selectedColor).toUpperCase(); set((state) => ({ palette: normalizePalette([...state.palette, nextColor]) })); },
   setHoveredPixel: (hoveredPixel) => set({ hoveredPixel }),
   commitPixelGrid: (pixelGrid, pixelSoftness, pixelOverrides, commit) => set((state) => {
     // 回退后继续编辑时，丢弃旧的前进分支，只保留当前活动分支。

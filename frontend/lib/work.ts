@@ -32,6 +32,10 @@ export interface CommunityWork {
   likeCount: number;
   commentCount: number;
   createTime: string | null;
+  collaborationEnabled: boolean;
+  onlineCount: number;
+  modificationCount: number;
+  uiKey?: string;
 }
 
 export function buildWorkPayload(state: PixelEditorState, title = state.workTitle || "Untitled pixel work") {

@@ -15,7 +15,7 @@ const works = [
 ];
 
 function PixelArtwork({ palette, title }: { palette: string[]; title: string }) {
-  return <div className="grid aspect-[5/4] grid-cols-4 gap-1 bg-[#0d1020] p-2" aria-label={`${title} 像素作品`}>{palette.map((color, index) => <span key={`${color}-${index}`} className="block min-h-0" style={{ backgroundColor: color }} />)}</div>;
+  return <div className="grid aspect-[5/4] grid-cols-4 gap-1 bg-[#0d1020] p-2" aria-label={`${title} 像素作品`}>{palette.map((color) => <span key={color} className="block min-h-0" style={{ backgroundColor: color }} />)}</div>;
 }
 
 export function ImageShowcase() {

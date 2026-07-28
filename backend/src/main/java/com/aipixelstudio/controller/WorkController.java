@@ -2,6 +2,9 @@ package com.aipixelstudio.controller;
 
 import com.aipixelstudio.common.Result;
 import com.aipixelstudio.dto.WorkSaveDTO;
+import com.aipixelstudio.dto.ArtworkPermissionDTO;
+import com.aipixelstudio.entity.ArtworkPermission;
+import com.aipixelstudio.service.CollaborationService;
 import com.aipixelstudio.entity.Work;
 import com.aipixelstudio.service.WorkService;
 import com.aipixelstudio.vo.WorkSaveVO;
@@ -23,9 +26,11 @@ import java.util.List;
 @RequestMapping("/api/work")
 public class WorkController {
     private final WorkService workService;
+    private final CollaborationService collaborationService;
 
-    public WorkController(WorkService workService) {
+    public WorkController(WorkService workService, CollaborationService collaborationService) {
         this.workService = workService;
+        this.collaborationService = collaborationService;
     }
 
     @PostMapping("/create")
@@ -43,6 +48,11 @@ public class WorkController {
     public Result<Void> submit(@PathVariable Long workId, HttpServletRequest servletRequest) {
         workService.submitForReview(currentUserId(servletRequest), workId);
         return Result.success(null);
+    }
+
+    @PutMapping("/{workId}/permission")
+    public Result<ArtworkPermission> permission(@PathVariable Long workId, @Valid @RequestBody ArtworkPermissionDTO request, HttpServletRequest servletRequest) {
+        return Result.success(collaborationService.updatePermission(currentUserId(servletRequest), workId, request.getVisibility(), request.getAllowEdit(), request.getAllowComment(), request.getAllowFork()));
     }
 
     @GetMapping("/my")
