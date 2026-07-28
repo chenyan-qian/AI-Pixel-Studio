@@ -35,7 +35,7 @@ export function Navbar() {
     <div className="theme-menu pixel-corners border p-1.5 shadow-2xl backdrop-blur-xl" role="menu">
       <Link className="theme-nav-link flex items-center gap-2 rounded-md px-3 py-2.5 text-sm transition" href="/profile" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><UserRound className="theme-accent size-4" />账户管理</Link>
       <Link className="theme-nav-link flex items-center gap-2 rounded-md px-3 py-2.5 text-sm transition" href="/works" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><CircleUserRound className="theme-accent size-4" />我的作品</Link>
-      <span className="theme-text-tertiary flex cursor-not-allowed items-center gap-2 px-3 py-2.5 text-sm" aria-disabled="true"><Settings className="size-4" />设置（即将开放）</span>
+      <Link className="theme-nav-link flex items-center gap-2 rounded-md px-3 py-2.5 text-sm transition" href="/settings" role="menuitem" onClick={() => { setAccountOpen(false); setMenuOpen(false); }}><Settings className="theme-accent size-4" />设置</Link>
       <div className="theme-divider my-1 border-t" />
       <button type="button" className="theme-error flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm transition" onClick={logout} role="menuitem"><LogOut className="size-4" />退出登录</button>
     </div>

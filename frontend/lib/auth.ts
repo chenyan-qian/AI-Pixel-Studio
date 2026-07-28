@@ -11,6 +11,15 @@ const USER_KEY = "ai-pixel-user";
 export function saveSession(token: string, user: AuthUser) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  try {
+    const savedSettings = JSON.parse(localStorage.getItem(`pixelverse-user-settings:${user.username}`) || "{}");
+    if (savedSettings.theme === "dark" || savedSettings.theme === "light" || savedSettings.theme === "system") {
+      localStorage.setItem("theme", savedSettings.theme);
+    }
+  } catch {
+    // A corrupt settings entry must not interrupt a successful login.
+  }
+  window.dispatchEvent(new Event("pixelverse-theme-change"));
 }
 
 export function getToken() { return localStorage.getItem(TOKEN_KEY); }

@@ -1,5 +1,6 @@
 package com.aipixelstudio.service.impl;
 
+import com.aipixelstudio.dto.ChangePasswordDTO;
 import com.aipixelstudio.dto.LoginDTO;
 import com.aipixelstudio.entity.User;
 import com.aipixelstudio.mapper.UserMapper;
@@ -65,6 +66,23 @@ public class UserServiceImpl implements UserService {
         loginVO.setRole(role);
         if ("ADMIN".equals(role)) adminService.recordOperation(user.getId(), "登录后台");
         return loginVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(Long userId, ChangePasswordDTO request) {
+        User user = userMapper.selectById(userId);
+        if (user == null) throw new IllegalArgumentException("用户不存在");
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("当前密码不正确");
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("新密码不能与当前密码相同");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateById(user);
     }
 
     private User findByUsername(String username) {

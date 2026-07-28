@@ -82,6 +82,34 @@ html, body { background: var(--bg-color); color: var(--text-primary); transition
 .theme-decoration-border { border-color: var(--border-color); }
 .theme-decoration-accent { background-color: var(--accent-color); }
 
+/* Settings controls use flex alignment rather than a fixed transform so the thumb remains inside the rail at every browser zoom level. */
+.settings-switch {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 44px;
+  height: 24px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background-color: var(--card-bg);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.settings-switch-on { justify-content: flex-end; border-color: var(--accent-color); background-color: var(--accent-color); }
+.settings-switch-off { justify-content: flex-start; }
+.settings-switch-thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #f8fafc;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.28);
+  transition: transform 160ms ease;
+}
+.settings-switch:hover { border-color: var(--accent-color); }
+.settings-switch:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 3px; }
+
 /* Legacy utility bridge: older screens inherit the same semantic contrast rules. */
 .text-white, .text-zinc-100, .text-zinc-200, .text-slate-100, .text-slate-200 { color: var(--text-primary) !important; }
 .text-zinc-300, .text-zinc-400, .text-slate-300, .text-slate-400 { color: var(--text-secondary) !important; }
