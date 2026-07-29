@@ -4,6 +4,8 @@ import com.aipixelstudio.dto.HistoryRecordSaveDTO;
 import com.aipixelstudio.dto.WorkSaveDTO;
 import com.aipixelstudio.entity.Work;
 import com.aipixelstudio.entity.WorkHistory;
+import com.aipixelstudio.entity.ArtworkPermission;
+import com.aipixelstudio.mapper.ArtworkPermissionMapper;
 import com.aipixelstudio.mapper.WorkHistoryMapper;
 import com.aipixelstudio.mapper.WorkMapper;
 import com.aipixelstudio.service.WorkService;
@@ -34,11 +36,13 @@ public class WorkServiceImpl implements WorkService {
     private static final Path UPLOAD_DIRECTORY = Path.of("uploads").toAbsolutePath().normalize();
     private final WorkMapper workMapper;
     private final WorkHistoryMapper workHistoryMapper;
+    private final ArtworkPermissionMapper permissionMapper;
     private final ObjectMapper objectMapper;
 
-    public WorkServiceImpl(WorkMapper workMapper, WorkHistoryMapper workHistoryMapper, ObjectMapper objectMapper) {
+    public WorkServiceImpl(WorkMapper workMapper, WorkHistoryMapper workHistoryMapper, ArtworkPermissionMapper permissionMapper, ObjectMapper objectMapper) {
         this.workMapper = workMapper;
         this.workHistoryMapper = workHistoryMapper;
+        this.permissionMapper = permissionMapper;
         this.objectMapper = objectMapper;
     }
 
@@ -55,8 +59,10 @@ public class WorkServiceImpl implements WorkService {
             work.setReviewStatus("DRAFT");
         } else {
             work = findOwnedWork(userId, workId);
-            // Any saved edit invalidates a prior review decision and must be reviewed again.
-            if ("PUBLISHED".equals(work.getReviewStatus()) || "PENDING".equals(work.getReviewStatus())) {
+            // Collaborative public works continue to be edited through versioned operations.
+            // Their published community record must remain visible while the owner saves a canvas snapshot.
+            boolean keepPublished = "PUBLISHED".equals(work.getReviewStatus()) && allowsCollaborativeEdits(work.getId());
+            if (!keepPublished && ("PUBLISHED".equals(work.getReviewStatus()) || "PENDING".equals(work.getReviewStatus()))) {
                 work.setReviewStatus("DRAFT");
                 work.setReviewNote(null);
                 work.setReviewerId(null);
@@ -126,6 +132,30 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    @Transactional
+    public void unpublish(Long userId, Long workId) {
+        Work work = findOwnedWork(userId, workId);
+        if (!"PUBLISHED".equals(work.getReviewStatus())) throw new IllegalArgumentException("Work is not published");
+        work.setReviewStatus("DRAFT");
+        work.setReviewNote(null);
+        work.setReviewerId(null);
+        work.setReviewedTime(null);
+        work.setPublishedTime(null);
+        work.setUpdateTime(LocalDateTime.now());
+        workMapper.updateById(work);
+
+        // A removed community work must not remain joinable through an old link.
+        ArtworkPermission permission = permissionMapper.selectById(workId);
+        if (permission != null) {
+            permission.setVisibility("PRIVATE");
+            permission.setAllowEdit(false);
+            permission.setAllowComment(false);
+            permission.setAllowFork(false);
+            permissionMapper.updateById(permission);
+        }
+    }
+
+    @Override
     public List<Work> publishedWorks() {
         return workMapper.selectList(Wrappers.<Work>lambdaQuery()
                 .eq(Work::getReviewStatus, "PUBLISHED")
@@ -173,6 +203,11 @@ public class WorkServiceImpl implements WorkService {
     private String json(JsonNode value) {
         try { return objectMapper.writeValueAsString(value); }
         catch (JsonProcessingException exception) { throw new IllegalArgumentException("像素数据格式不正确"); }
+    }
+
+    private boolean allowsCollaborativeEdits(Long workId) {
+        ArtworkPermission permission = permissionMapper.selectById(workId);
+        return permission != null && "PUBLIC_COLLAB".equals(permission.getVisibility()) && Boolean.TRUE.equals(permission.getAllowEdit());
     }
 
     /** Generates a durable preview for work cards directly from the saved grid. */

@@ -51,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public AdminStatisticsDTO statistics() {
-        return new AdminStatisticsDTO(userMapper.selectCount(null), workMapper.selectCount(null),
+        return new AdminStatisticsDTO(userMapper.selectCount(null), workMapper.selectCount(manageableWorks()),
                 adminMapper.countTodayUpload(), adminMapper.countTodayGenerate());
     }
 
@@ -85,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<AdminArtworkVO> artworks() {
         Map<Long, String> usernames = usernames();
-        return workMapper.selectList(Wrappers.<Work>lambdaQuery().orderByDesc(Work::getCreateTime)).stream()
+        return workMapper.selectList(manageableWorks().orderByDesc(Work::getCreateTime)).stream()
                 .map(work -> new AdminArtworkVO(work.getId(), work.getUserId(), usernames.getOrDefault(work.getUserId(), "已删除用户"),
                         work.getTitle(), work.getPixelSize(), work.getSourceImageUrl(), work.getPixelImageUrl(),
                         work.getReviewStatus(), work.getReviewNote(), work.getPublishedTime(), work.getPixelData(), work.getCreateTime(), work.getUpdateTime()))
@@ -192,6 +192,11 @@ public class AdminServiceImpl implements AdminService {
         Map<Long, String> result = new HashMap<>();
         userMapper.selectList(null).forEach(user -> result.put(user.getId(), user.getUsername()));
         return result;
+    }
+
+    /** Drafts are private author work and must never enter the administration queue. */
+    private com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Work> manageableWorks() {
+        return Wrappers.<Work>lambdaQuery().in(Work::getReviewStatus, "PENDING", "PUBLISHED", "REJECTED");
     }
 
     private Path safePath(String filename) {

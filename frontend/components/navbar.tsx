@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronDown, CircleUserRound, LogOut, Menu, Settings, Sparkles, UserRound, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
+import { type AuthUser, clearSession, refreshSession } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
@@ -21,7 +21,7 @@ export function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
 
-  useEffect(() => setUser(getToken() ? getUser() : null), [pathname]);
+  useEffect(() => { refreshSession().then(setUser); }, [pathname]);
 
   function logout() {
     clearSession();

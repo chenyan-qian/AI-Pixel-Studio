@@ -2,7 +2,7 @@
 
 import { ArrowRight, ImagePlus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getToken, getUser } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
 
 const pixels = [
   { id: "hero-pixel-01", color: "#6d5dfc" }, { id: "hero-pixel-02", color: "#33d7ff" }, { id: "hero-pixel-03", color: "#8f6bff" }, { id: "hero-pixel-04", color: "#30e6c4" },
@@ -13,7 +13,7 @@ const pixels = [
 
 export function Hero() {
   const router = useRouter();
-  function openWorkspace() { router.push(getToken() && getUser() ? "/workspace" : "/login"); }
+  function openWorkspace() { router.push(getToken() ? "/workspace" : "/login"); }
 
   return (
     <section className="hero-grid relative isolate overflow-hidden px-5 pb-20 pt-32 sm:px-8 sm:pb-28 sm:pt-40" id="home">

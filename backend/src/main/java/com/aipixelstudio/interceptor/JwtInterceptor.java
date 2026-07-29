@@ -45,14 +45,13 @@ public class JwtInterceptor implements HandlerInterceptor {
             return reject(response, HttpServletResponse.SC_FORBIDDEN, "Account is disabled or unavailable");
         }
 
-        String role = claims.get("role", String.class);
-        if (role == null) role = user.getRole() == null ? "USER" : user.getRole();
+        String role = user.getRole() == null ? "USER" : user.getRole();
         if (request.getRequestURI().startsWith("/admin/") && !"ADMIN".equals(role)) {
             return reject(response, HttpServletResponse.SC_FORBIDDEN, "Administrator permission required");
         }
 
         request.setAttribute("userId", userId);
-        request.setAttribute("username", claims.get("username", String.class));
+        request.setAttribute("username", user.getUsername());
         request.setAttribute("role", role);
         return true;
     }

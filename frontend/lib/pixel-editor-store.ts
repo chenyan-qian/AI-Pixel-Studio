@@ -3,7 +3,7 @@ import { create } from "zustand";
 export const TRANSPARENT = "transparent";
 /** 最近保留完整矩阵快照、可直接恢复的历史记录数量。 */
 export const FULL_SNAPSHOT_LIMIT = 20;
-export type EditorTool = "pencil" | "eraser" | "fill" | "eyedropper";
+export type EditorTool = "pencil" | "eraser" | "eyedropper";
 /** The editor's source of truth: one colour per user-visible pixel block. */
 export type PixelGrid = string[][];
 export type PixelMatrix = PixelGrid;
@@ -182,26 +182,4 @@ export function getPixelBlockCoordinates(logicalX: number, logicalY: number, pix
     col: Math.min(gridWidth - 1, Math.max(0, Math.floor(logicalX / pixelSize))),
   };
 }
-export function getConnectedPixelBlocks(pixelGrid: PixelGrid, col: number, row: number) {
-  const target = pixelGrid[row]?.[col];
-  if (target === undefined) return [] as Array<{ row: number; col: number }>;
-  const cells: Array<{ row: number; col: number }> = [];
-  const visited = new Set<string>();
-  const stack: Array<[number, number]> = [[col, row]];
-  while (stack.length > 0) {
-    const [currentCol, currentRow] = stack.pop()!;
-    const key = `${currentCol}:${currentRow}`;
-    if (visited.has(key) || pixelGrid[currentRow]?.[currentCol] !== target) continue;
-    visited.add(key);
-    cells.push({ row: currentRow, col: currentCol });
-    stack.push([currentCol + 1, currentRow], [currentCol - 1, currentRow], [currentCol, currentRow + 1], [currentCol, currentRow - 1]);
-  }
-  return cells;
-}
 export function paintMatrixSoftness(matrix: SoftnessMatrix, x: number, y: number, softness: number) { if (!matrix[y] || matrix[y][x] === undefined || matrix[y][x] === softness) return matrix; const next = cloneSoftnessMatrix(matrix); next[y][x] = softness; return next; }
-export function fillMatrix(matrix: PixelMatrix, x: number, y: number, color: string) {
-  const target = matrix[y]?.[x]; if (target === undefined || target === color) return matrix;
-  const next = cloneMatrix(matrix); const stack: Array<[number, number]> = [[x, y]];
-  while (stack.length > 0) { const [currentX, currentY] = stack.pop()!; if (next[currentY]?.[currentX] !== target) continue; next[currentY][currentX] = color; stack.push([currentX + 1, currentY], [currentX - 1, currentY], [currentX, currentY + 1], [currentX, currentY - 1]); }
-  return next;
-}

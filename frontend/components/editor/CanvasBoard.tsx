@@ -2,7 +2,7 @@
 
 import { Maximize, Minus, Plus } from "lucide-react";
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fillMatrix, getConnectedPixelBlocks, getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import { useTheme } from "@/context/ThemeContext";
 import { emitLocalPixelChanges } from "@/lib/collaboration";
 
@@ -334,18 +334,6 @@ export default function CanvasBoard() {
     const { x, y } = getCell(event);
     const color = (draftRef.current || pixelGrid)[y]?.[x] || TRANSPARENT;
     if (tool === "eyedropper") { if (color !== TRANSPARENT) setSelectedColor(color); return; }
-    if (tool === "fill") {
-      const connectedBlocks = getConnectedPixelBlocks(pixelGrid, x, y);
-      const next = fillMatrix(pixelGrid, x, y, selectedColor);
-      if (connectedBlocks.length) {
-        const connectedKeys = new Set(connectedBlocks.map(({ row, col }) => `${col}:${row}`));
-        const nextSoftness = pixelSoftness.map((row, rowIndex) => row.map((softness, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) ? edgeSoftness : softness));
-        const nextOverrides = pixelOverrides.map((row, rowIndex) => row.map((overridden, columnIndex) => connectedKeys.has(`${columnIndex}:${rowIndex}`) || overridden));
-        commitPixelGrid(next, nextSoftness, nextOverrides, { action: "fill", description: `Fill with ${selectedColor}` });
-        emitLocalPixelChanges(connectedBlocks.map(({ row, col }) => ({ x: col, y: row, color: next[row][col], softness: nextSoftness[row][col], overridden: nextOverrides[row][col] })));
-      }
-      return;
-    }
     event.currentTarget.setPointerCapture(event.pointerId);
     activePointerIdRef.current = event.pointerId;
     drawingRef.current = true;

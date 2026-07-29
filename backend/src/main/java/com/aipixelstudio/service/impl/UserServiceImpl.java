@@ -8,6 +8,7 @@ import com.aipixelstudio.service.UserService;
 import com.aipixelstudio.service.AdminService;
 import com.aipixelstudio.utils.JwtUtil;
 import com.aipixelstudio.vo.LoginVO;
+import com.aipixelstudio.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,13 +60,22 @@ public class UserServiceImpl implements UserService {
         if (!Integer.valueOf(1).equals(user.getStatus())) throw new IllegalArgumentException("Account is disabled");
         LoginVO loginVO = new LoginVO();
         String role = user.getRole() == null ? "USER" : user.getRole();
-        loginVO.setToken(jwtUtil.generateToken(user.getId(), user.getUsername(), role));
+        loginVO.setToken(jwtUtil.generateToken(user.getId()));
         loginVO.setUsername(user.getUsername());
         loginVO.setNickname(user.getNickname());
         loginVO.setAvatar(user.getAvatar());
         loginVO.setRole(role);
         if ("ADMIN".equals(role)) adminService.recordOperation(user.getId(), "登录后台");
         return loginVO;
+    }
+
+    @Override
+    public UserInfoVO currentUser(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null || !Integer.valueOf(1).equals(user.getStatus())) {
+            throw new IllegalArgumentException("Account is unavailable");
+        }
+        return UserInfoVO.from(user);
     }
 
     @Override

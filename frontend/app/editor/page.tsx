@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PixelEditor from "@/components/editor/PixelEditor";
-import { clearSession, getToken, getUser } from "@/lib/auth";
+import { refreshSession } from "@/lib/auth";
 import { normalizePalette, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import type { WorkRecord } from "@/lib/work";
@@ -13,15 +13,20 @@ export default function EditorPage() {
   const router = useRouter();
   const gridWidth = usePixelEditorStore((state) => state.gridWidth);
   const [ready, setReady] = useState(false);
+  const [reviewStatus, setReviewStatus] = useState<WorkRecord["reviewStatus"]>("DRAFT");
 
   useEffect(() => {
-    if (!getToken() || !getUser()) { clearSession(); router.replace("/login"); return; }
-    const requestedWorkId = new URLSearchParams(window.location.search).get("workId");
-    if (!requestedWorkId) {
-      if (gridWidth === 0) router.replace("/workspace"); else setReady(true);
-      return;
-    }
-    request.get(`/api/work/${requestedWorkId}`).then((response) => {
+    let cancelled = false;
+    refreshSession().then((user) => {
+      if (!user) { router.replace("/login"); return; }
+      const requestedWorkId = new URLSearchParams(window.location.search).get("workId");
+      if (!requestedWorkId) {
+        if (gridWidth === 0) router.replace("/workspace"); else setReady(true);
+        return;
+      }
+      return request.get(`/api/work/${requestedWorkId}`);
+    }).then((response) => {
+      if (!response || cancelled) return;
       const result = response as unknown as { code: number; msg: string; data: WorkRecord };
       if (result.code !== 200 || !result.data) throw new Error(result.msg || "Unable to load work");
       const saved = JSON.parse(result.data.pixelData) as Record<string, unknown>;
@@ -40,9 +45,11 @@ export default function EditorPage() {
         selectedColor: typeof saved.selectedColor === "string" ? saved.selectedColor : "#FF5733",
         edgeSoftness: typeof saved.edgeSoftness === "number" ? saved.edgeSoftness : 0, hoveredPixel: null,
       });
+      setReviewStatus(result.data.reviewStatus);
       setReady(true);
-    }).catch(() => router.replace("/works"));
+    }).catch(() => { if (!cancelled) router.replace("/works"); });
+    return () => { cancelled = true; };
   }, [router, gridWidth]);
 
-  return ready ? <PixelEditor /> : <main className="grid min-h-screen place-items-center bg-[#08090d] text-sm text-zinc-500">正在打开编辑器...</main>;
+  return ready ? <PixelEditor initialReviewStatus={reviewStatus} /> : <main className="grid min-h-screen place-items-center bg-[#08090d] text-sm text-zinc-500">正在打开编辑器...</main>;
 }

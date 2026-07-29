@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Eye, EyeOff, LockKeyhole, Sparkles, UserRound } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveSession } from "@/lib/auth";
+import { refreshSession, saveSession } from "@/lib/auth";
 import request from "@/lib/request";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -27,9 +27,11 @@ export default function LoginPage() {
     try {
       const response = await request.post<never, LoginResponse>("/api/user/login", { username, password });
       if (response.code !== 200 || !response.data?.token) throw new Error(response.msg || "登录失败");
-      saveSession(response.data.token, response.data);
+      saveSession(response.data.token);
+      const user = await refreshSession();
+      if (!user) throw new Error("Unable to verify login session");
       // 登录成功后先回到首页，由用户自行决定是否进入工作台。
-      router.replace(response.data.role === "ADMIN" ? "/admin" : "/");
+      router.replace(user.role === "ADMIN" ? "/admin" : "/");
     } catch (caughtError) {
       const responseMessage = (caughtError as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
       setError(responseMessage || (caughtError instanceof Error ? caughtError.message : "登录失败，请稍后重试"));

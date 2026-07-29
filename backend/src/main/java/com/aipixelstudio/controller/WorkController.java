@@ -50,6 +50,12 @@ public class WorkController {
         return Result.success(null);
     }
 
+    @PostMapping("/{workId}/unpublish")
+    public Result<Void> unpublish(@PathVariable Long workId, HttpServletRequest servletRequest) {
+        workService.unpublish(currentUserId(servletRequest), workId);
+        return Result.success(null);
+    }
+
     @PutMapping("/{workId}/permission")
     public Result<ArtworkPermission> permission(@PathVariable Long workId, @Valid @RequestBody ArtworkPermissionDTO request, HttpServletRequest servletRequest) {
         return Result.success(collaborationService.updatePermission(currentUserId(servletRequest), workId, request.getVisibility(), request.getAllowEdit(), request.getAllowComment(), request.getAllowFork()));

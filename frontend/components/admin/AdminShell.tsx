@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BarChart3, FileImage, LogOut, Menu, ShieldCheck, UsersRound, X } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { clearSession, getToken, getUser, isAdmin } from "@/lib/auth";
+import { clearSession, refreshSession } from "@/lib/auth";
 
 const navigation = [
   { href: "/admin", label: "数据统计", icon: BarChart3 }, { href: "/admin/users", label: "用户管理", icon: UsersRound },
@@ -15,7 +15,16 @@ const navigation = [
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname(); const router = useRouter();
   const [ready, setReady] = useState(false); const [open, setOpen] = useState(false); const [username, setUsername] = useState("");
-  useEffect(() => { if (!getToken() || !isAdmin()) { router.replace("/"); return; } setUsername(getUser()?.username || "管理员"); setReady(true); }, [router]);
+  useEffect(() => {
+    let cancelled = false;
+    refreshSession().then((user) => {
+      if (cancelled) return;
+      if (!user || user.role !== "ADMIN") { router.replace("/"); return; }
+      setUsername(user.username);
+      setReady(true);
+    });
+    return () => { cancelled = true; };
+  }, [router]);
   function logout() { clearSession(); router.replace("/login"); }
   if (!ready) return <main className="grid min-h-screen place-items-center bg-slate-950 text-sm text-slate-400">正在验证管理员权限…</main>;
   const menu = <nav className="space-y-1 p-3">{navigation.map(({ href, label, icon: Icon }) => {

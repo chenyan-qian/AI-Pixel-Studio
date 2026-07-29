@@ -7,7 +7,7 @@ import PixelSizeSelector from "@/components/PixelSizeSelector";
 import StartGenerateButton from "@/components/StartGenerateButton";
 import UploadArea from "@/components/UploadArea";
 import { Navbar } from "@/components/navbar";
-import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
+import { type AuthUser, refreshSession } from "@/lib/auth";
 import { type PixelCell, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import { buildWorkPayload } from "@/lib/work";
@@ -53,14 +53,14 @@ export default function WorkspacePage() {
   const [processError, setProcessError] = useState("");
 
   useEffect(() => {
-    const savedUser = getToken() ? getUser() : null;
-    if (!savedUser) {
-      clearSession();
-      router.replace("/login");
-      return;
-    }
-    setUser(savedUser);
-    setCheckedAuth(true);
+    let cancelled = false;
+    refreshSession().then((currentUser) => {
+      if (cancelled) return;
+      if (!currentUser) { router.replace("/login"); return; }
+      setUser(currentUser);
+      setCheckedAuth(true);
+    });
+    return () => { cancelled = true; };
   }, [router]);
 
   useEffect(() => () => {

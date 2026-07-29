@@ -1,6 +1,8 @@
 package com.aipixelstudio.websocket;
 
 import com.aipixelstudio.utils.JwtUtil;
+import com.aipixelstudio.entity.User;
+import com.aipixelstudio.mapper.UserMapper;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -14,14 +16,18 @@ import java.util.Map;
 @Component
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     private final JwtUtil jwtUtil;
-    public JwtHandshakeInterceptor(JwtUtil jwtUtil) { this.jwtUtil = jwtUtil; }
+    private final UserMapper userMapper;
+    public JwtHandshakeInterceptor(JwtUtil jwtUtil, UserMapper userMapper) { this.jwtUtil = jwtUtil; this.userMapper = userMapper; }
     @Override public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler handler, Map<String, Object> attributes) {
         MultiValueMap<String, String> query = UriComponentsBuilder.fromUri(request.getURI()).build().getQueryParams();
         String token = query.getFirst("token");
         if (token == null || !jwtUtil.validateToken(token)) return false;
         Claims claims = jwtUtil.parseToken(token);
-        attributes.put("userId", Long.valueOf(claims.getSubject()));
-        attributes.put("username", claims.get("username", String.class));
+        Long userId = Long.valueOf(claims.getSubject());
+        User user = userMapper.selectById(userId);
+        if (user == null || !Integer.valueOf(1).equals(user.getStatus())) return false;
+        attributes.put("userId", userId);
+        attributes.put("username", user.getUsername());
         return true;
     }
     @Override public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler handler, Exception exception) { }

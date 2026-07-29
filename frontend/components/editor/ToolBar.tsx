@@ -1,12 +1,11 @@
 "use client";
 
-import { Eraser, PaintBucket, Pencil, Pipette } from "lucide-react";
+import { Eraser, Pencil, Pipette } from "lucide-react";
 import { type EditorTool, usePixelEditorStore } from "@/lib/pixel-editor-store";
 
 const tools: Array<{ id: EditorTool; label: string; icon: typeof Pencil }> = [
   { id: "pencil", label: "画笔", icon: Pencil },
   { id: "eraser", label: "橡皮擦", icon: Eraser },
-  { id: "fill", label: "填充", icon: PaintBucket },
   { id: "eyedropper", label: "吸管", icon: Pipette },
 ];
 

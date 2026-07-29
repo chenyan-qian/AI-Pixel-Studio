@@ -4,7 +4,7 @@ import { CalendarDays, Mail, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
-import { type AuthUser, clearSession, getToken, getUser } from "@/lib/auth";
+import { type AuthUser, refreshSession } from "@/lib/auth";
 
 /** 账户展示页，后续接入资料接口后再开放可编辑能力。 */
 export default function ProfilePage() {
@@ -13,14 +13,14 @@ export default function ProfilePage() {
   const [checkedAuth, setCheckedAuth] = useState(false);
 
   useEffect(() => {
-    const savedUser = getToken() ? getUser() : null;
-    if (!savedUser) {
-      clearSession();
-      router.replace("/login");
-      return;
-    }
-    setUser(savedUser);
-    setCheckedAuth(true);
+    let cancelled = false;
+    refreshSession().then((currentUser) => {
+      if (cancelled) return;
+      if (!currentUser) { router.replace("/login"); return; }
+      setUser(currentUser);
+      setCheckedAuth(true);
+    });
+    return () => { cancelled = true; };
   }, [router]);
 
   if (!checkedAuth || !user) return <main className="grid min-h-screen place-items-center bg-[#08090d] text-sm text-zinc-500">正在验证登录状态…</main>;

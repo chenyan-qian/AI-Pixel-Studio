@@ -20,21 +20,18 @@ public class JwtUtil {
         this.expirationMilliseconds = expirationMilliseconds;
     }
 
-    public String generateToken(Long userId, String username, String role) {
+    /**
+     * A token identifies one account only. Mutable profile and authorization data
+     * are loaded from the database for every request.
+     */
+    public String generateToken(Long userId) {
         Date now = new Date();
         return Jwts.builder()
                 .subject(String.valueOf(userId))
-                .claim("username", username)
-                .claim("role", role)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationMilliseconds))
                 .signWith(secretKey)
                 .compact();
-    }
-
-    /** Compatibility overload for old callers. */
-    public String generateToken(Long userId, String username) {
-        return generateToken(userId, username, "USER");
     }
 
     public Claims parseToken(String token) {

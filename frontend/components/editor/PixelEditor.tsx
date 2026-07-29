@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Download, ImageDown, Save, Send } from "lucide-react";
-import { useState } from "react";
+import { Archive, Download, ImageDown, Save, Send } from "lucide-react";
+import { useEffect, useState } from "react";
 import CanvasBoard from "@/components/editor/CanvasBoard";
 import ColorPicker from "@/components/editor/ColorPicker";
 import HistoryPanel from "@/components/editor/HistoryPanel";
@@ -12,7 +12,7 @@ import { downloadImage, exportPixelImage } from "@/lib/pixel-export";
 import { TRANSPARENT, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { buildWorkPayload } from "@/lib/work";
+import { buildWorkPayload, type WorkRecord } from "@/lib/work";
 
 interface SaveWorkResponse { code: number; msg: string; data: { id: number }; }
 
@@ -23,7 +23,7 @@ function toRgbText(color: string) {
 }
 
 /** 参考 Piskel 布局的像素编辑工作台。 */
-export default function PixelEditor() {
+export default function PixelEditor({ collaborationMode = false, initialReviewStatus = "DRAFT" }: { collaborationMode?: boolean; initialReviewStatus?: WorkRecord["reviewStatus"] }) {
   const pixelGrid = usePixelEditorStore((state) => state.pixelGrid);
   const pixelOverrides = usePixelEditorStore((state) => state.pixelOverrides);
   const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
@@ -44,6 +44,9 @@ export default function PixelEditor() {
   const [exporting, setExporting] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [collaborationEnabled, setCollaborationEnabled] = useState(false);
+  const [reviewStatus, setReviewStatus] = useState<WorkRecord["reviewStatus"]>(initialReviewStatus);
+
+  useEffect(() => setReviewStatus(initialReviewStatus), [initialReviewStatus]);
 
   async function exportImage(format: "png" | "jpg") {
     if (exporting) return;
@@ -61,6 +64,10 @@ export default function PixelEditor() {
   }
 
   async function saveWork(): Promise<boolean> {
+    if (collaborationMode) {
+      setSaveMessage("协作画布请使用顶部的保存版本按钮");
+      return false;
+    }
     setSaving(true);
     setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
@@ -72,6 +79,7 @@ export default function PixelEditor() {
         : await request.post<typeof payload, SaveWorkResponse>("/api/work/create", payload);
       if (response.code !== 200 || !response.data) throw new Error(response.msg || "保存失败");
       setWorkId(response.data.id);
+      if (reviewStatus === "PUBLISHED") setReviewStatus("DRAFT");
       setSaveMessage("已保存");
       return true;
     } catch (error) {
@@ -91,6 +99,7 @@ export default function PixelEditor() {
       const permission = await request.put(`/api/work/${savedWorkId}/permission`, { visibility: collaborationEnabled ? "PUBLIC_COLLAB" : "PUBLIC", allowEdit: collaborationEnabled, allowComment: true, allowFork: true }) as unknown as { code: number; msg: string };
       if (permission.code !== 200) throw new Error(permission.msg || "保存作品权限失败");
       const response = await request.post(`/api/work/${savedWorkId}/submit`) as unknown as { code: number; msg: string };
+      if (response.code === 200) setReviewStatus("PENDING");
       if (response.code !== 200) throw new Error(response.msg || "提交审核失败");
       setSaveMessage("已提交管理员审核");
     } catch (error) {
@@ -98,11 +107,26 @@ export default function PixelEditor() {
     } finally { setPublishing(false); }
   }
 
+  async function unpublishWork() {
+    if (!workId || publishing) return;
+    if (!window.confirm("确认下架这件作品？下架后将不再显示在社区。")) return;
+    setPublishing(true);
+    setSaveMessage("");
+    try {
+      const response = await request.post(`/api/work/${workId}/unpublish`) as unknown as { code: number; msg: string };
+      if (response.code !== 200) throw new Error(response.msg || "Unable to unpublish work");
+      setReviewStatus("DRAFT");
+      setSaveMessage("作品已下架");
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "Unable to unpublish work");
+    } finally { setPublishing(false); }
+  }
+
   return (
     <main className="flex min-h-screen flex-col bg-[#08090d] text-zinc-100">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.1] bg-[#101119] px-4">
         <div className="flex items-center gap-4"><Link href="/workspace" className="text-sm font-semibold text-white">PixelVerse</Link><span className="border-l border-white/[0.12] pl-4 text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px 像素编辑器</span></div>
-        <div className="flex items-center gap-2"><ThemeToggle /><button type="button" onClick={saveWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button><button type="button" onClick={submitForReview} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-cyan-400/50 bg-cyan-400/10 px-2.5 text-xs text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-50"><Send className="size-3.5" />{publishing ? "提交中" : "提交发布"}</button><button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
+        <div className="flex items-center gap-2"><ThemeToggle /><button type="button" onClick={saveWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button>{reviewStatus === "PUBLISHED" ? <button type="button" onClick={unpublishWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-amber-400/50 bg-amber-400/10 px-2.5 text-xs text-amber-100 hover:bg-amber-400/20 disabled:opacity-50"><Archive className="size-3.5" />{publishing ? "下架中" : "下架"}</button> : <button type="button" onClick={submitForReview} disabled={saving || publishing || reviewStatus === "PENDING"} className="inline-flex h-8 items-center gap-1.5 border border-cyan-400/50 bg-cyan-400/10 px-2.5 text-xs text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-50"><Send className="size-3.5" />{publishing ? "提交中" : reviewStatus === "PENDING" ? "审核中" : "提交发布"}</button>}<button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
       </header>
       <div className="flex items-center justify-end border-b border-white/[0.08] bg-[#101119] px-4 py-2"><label className="inline-flex items-center gap-2 text-xs text-zinc-400"><input type="checkbox" checked={collaborationEnabled} onChange={(event) => setCollaborationEnabled(event.target.checked)} className="accent-cyan-400" />公开发布后允许其他用户参与创作</label></div>
       <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[58px_minmax(0,1fr)_280px] lg:grid-rows-1">
