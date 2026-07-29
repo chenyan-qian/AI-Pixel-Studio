@@ -24,19 +24,10 @@ function toRgbText(color: string) {
 
 /** 参考 Piskel 布局的像素编辑工作台。 */
 export default function PixelEditor({ collaborationMode = false, initialReviewStatus = "DRAFT" }: { collaborationMode?: boolean; initialReviewStatus?: WorkRecord["reviewStatus"] }) {
-  const pixelGrid = usePixelEditorStore((state) => state.pixelGrid);
-  const pixelOverrides = usePixelEditorStore((state) => state.pixelOverrides);
-  const pixelSoftness = usePixelEditorStore((state) => state.pixelSoftness);
   const gridWidth = usePixelEditorStore((state) => state.gridWidth);
   const gridHeight = usePixelEditorStore((state) => state.gridHeight);
   const pixelSize = usePixelEditorStore((state) => state.pixelSize);
-  const canvasWidth = usePixelEditorStore((state) => state.canvasWidth);
-  const canvasHeight = usePixelEditorStore((state) => state.canvasHeight);
-  const sourceImageUrl = usePixelEditorStore((state) => state.sourceImageUrl);
-  const sourceWidth = usePixelEditorStore((state) => state.sourceWidth);
-  const sourceHeight = usePixelEditorStore((state) => state.sourceHeight);
   const hoveredPixel = usePixelEditorStore((state) => state.hoveredPixel);
-  const history = usePixelEditorStore((state) => state.history);
   const workId = usePixelEditorStore((state) => state.workId);
   const setWorkId = usePixelEditorStore((state) => state.setWorkId);
   const [saving, setSaving] = useState(false);
@@ -54,6 +45,7 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
     setSaveMessage("");
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
     try {
+      const { pixelGrid, pixelOverrides, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight } = usePixelEditorStore.getState();
       const dataUrl = await exportPixelImage({ pixelGrid, pixelOverrides, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight, mimeType });
       downloadImage(dataUrl, format);
     } catch (error) {

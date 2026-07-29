@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import PixelEditor from "@/components/editor/PixelEditor";
 import OnlineUsers from "@/components/collaboration/OnlineUsers";
 import VersionTimeline, { type ArtworkVersion } from "@/components/collaboration/VersionTimeline";
-import { applyRemotePixelUpdate, collaborationSocketUrl, LOCAL_PIXEL_CHANGE_EVENT, normalizeOnlineUsers, type CollaborationEvent, type PixelChange, type RenderedCollaborationUser } from "@/lib/collaboration";
+import { applyRemoteCanvasState, applyRemotePixelUpdates, collaborationSocketUrl, LOCAL_PIXEL_CHANGE_EVENT, normalizeOnlineUsers, type CollaborationEvent, type PixelChange, type RenderedCollaborationUser } from "@/lib/collaboration";
 import { usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 
@@ -35,28 +35,44 @@ export default function CollaborationEditor({ artworkId, title, author, initialV
   useEffect(() => {
     let disposed = false;
     let retryTimer: number | null = null;
+    const pendingChanges = new Map<string, PixelChange>();
+    const send = (changes: PixelChange[]) => {
+      const socket = socketRef.current;
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        changes.forEach((change) => pendingChanges.set(`${change.x}:${change.y}`, change));
+        return false;
+      }
+      socket.send(JSON.stringify({ type: "PIXEL_BATCH", artworkId, changes }));
+      return true;
+    };
+    const flushPendingChanges = () => {
+      if (!pendingChanges.size || !send([...pendingChanges.values()])) return;
+      pendingChanges.clear();
+    };
     const connect = () => {
       const socket = new WebSocket(collaborationSocketUrl(artworkId));
       socketRef.current = socket;
-      socket.onopen = () => { setConnected(true); setSaveState("实时同步中"); };
+      socket.onopen = () => { setConnected(true); setSaveState("实时同步中"); flushPendingChanges(); };
       socket.onclose = () => {
         setConnected(false); setUsers([]);
         if (!disposed) { setSaveState("连接中断，正在重试..."); retryTimer = window.setTimeout(connect, 2000); }
       };
       socket.onerror = () => setSaveState("实时连接失败，正在重试...");
       socket.onmessage = (message) => {
-        const event = JSON.parse(message.data) as CollaborationEvent;
+        let event: CollaborationEvent;
+        try { event = JSON.parse(message.data) as CollaborationEvent; } catch { return; }
         if (event.type === "ROOM_STATE") setUsers(normalizeOnlineUsers(event.onlineUsers || []));
-        if (event.type === "PIXEL_UPDATE") { applyRemotePixelUpdate(event); setSaveState(`${event.username || "协作者"} 刚刚修改了像素`); }
+        if (event.type === "CANVAS_STATE") applyRemoteCanvasState(event);
+        if (event.type === "PIXEL_UPDATE" || event.type === "PIXEL_BATCH") applyRemotePixelUpdates(event);
+        const savedVersion = event.version;
+        if (event.type === "VERSION_SAVED" && savedVersion) setVersions((current) => normalizeVersions([savedVersion, ...current]));
       };
     };
     connect();
     const sendChanges = (event: Event) => {
       const changes = (event as CustomEvent<PixelChange[]>).detail;
-      const socket = socketRef.current;
-      if (!socket || socket.readyState !== WebSocket.OPEN) return;
-      changes.forEach((change) => socket.send(JSON.stringify({ type: "PIXEL_UPDATE", artworkId, ...change })));
-      setSaveState("已同步到创作房间");
+      if (!changes?.length) return;
+      if (!send(changes)) setSaveState("连接恢复后将自动同步");
     };
     window.addEventListener(LOCAL_PIXEL_CHANGE_EVENT, sendChanges);
     return () => { disposed = true; if (retryTimer !== null) window.clearTimeout(retryTimer); window.removeEventListener(LOCAL_PIXEL_CHANGE_EVENT, sendChanges); socketRef.current?.close(); };
@@ -80,7 +96,7 @@ export default function CollaborationEditor({ artworkId, title, author, initialV
       const parsed = JSON.parse(response.data.snapshotUrl) as { pixelGrid: string[][]; pixelSoftness: number[][]; pixelOverrides: boolean[][] };
       const state = usePixelEditorStore.getState();
       state.commitPixelGrid(parsed.pixelGrid, parsed.pixelSoftness, parsed.pixelOverrides, { action: "pixel_change", description: `恢复 V${version.versionNumber}` });
-      setVersions((current) => normalizeVersions([response.data, ...current])); setSaveState(`已恢复 V${version.versionNumber}`);
+      setSaveState(`已恢复 V${version.versionNumber}`);
     } catch (error) { setSaveState(error instanceof Error ? error.message : "恢复失败"); }
   }, [artworkId]);
 

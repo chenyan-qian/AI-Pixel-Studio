@@ -98,6 +98,10 @@ public class CollaborationService {
         operationMapper.insert(operation);
     }
 
+    public void recordOperations(List<PixelOperation> operations) {
+        if (!operations.isEmpty()) operationMapper.insertBatch(operations);
+    }
+
     @Transactional
     public ArtworkVersion saveVersion(Long artworkId, Long userId, String snapshot, String description) {
         Work work = workMapper.selectById(artworkId);
@@ -116,9 +120,15 @@ public class CollaborationService {
 
     @Transactional
     public ArtworkVersion restoreVersion(Long artworkId, Long versionNumber, Long userId) {
+        Work work = workMapper.selectById(artworkId);
+        if (work == null || !canCollaborate(artworkId)) throw new IllegalArgumentException("Collaboration is unavailable");
         ArtworkVersion source = versionMapper.selectOne(Wrappers.<ArtworkVersion>lambdaQuery().eq(ArtworkVersion::getArtworkId, artworkId).eq(ArtworkVersion::getVersionNumber, versionNumber));
         if (source == null) throw new IllegalArgumentException("Version not found");
-        return saveVersion(artworkId, userId, source.getSnapshotUrl(), "Restored Version " + versionNumber);
+        validateSnapshot(source.getSnapshotUrl(), work);
+        // Restoring selects an existing checkpoint; it must not create another timeline entry.
+        work.setPixelData(source.getSnapshotUrl());
+        workMapper.updateById(work);
+        return source;
     }
 
     private void validateSnapshot(String snapshot, Work work) {

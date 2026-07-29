@@ -60,6 +60,7 @@ export interface PixelEditorState {
   addPaletteColor: (color?: string) => void;
   setHoveredPixel: (pixel: HoveredPixel | null) => void;
   commitPixelGrid: (pixelGrid: PixelGrid, pixelSoftness: SoftnessMatrix, pixelOverrides: PixelOverrideMatrix, commit: HistoryCommit) => void;
+  replaceCollaborationGrid: (pixelGrid: PixelGrid, pixelSoftness: SoftnessMatrix, pixelOverrides: PixelOverrideMatrix) => void;
   goToHistory: (index: number) => void;
   undo: () => void;
   redo: () => void;
@@ -155,6 +156,10 @@ export const usePixelEditorStore = create<PixelEditorState>((set, get) => ({
     const next: HistoryRecord = { id: nextId, action: commit.action, description: commit.description, timestamp: now(), pixelData: cloneMatrix(pixelGrid), softnessData: cloneSoftnessMatrix(pixelSoftness), overrideData: cloneOverrideMatrix(pixelOverrides) };
     const history = compact([...activeRecords, next]);
     return { pixelGrid: cloneMatrix(pixelGrid), pixelSoftness: cloneSoftnessMatrix(pixelSoftness), pixelOverrides: cloneOverrideMatrix(pixelOverrides), history, historyIndex: history.length - 1 };
+  }),
+  // Remote edits must update the canvas without creating a full local undo snapshot for every network batch.
+  replaceCollaborationGrid: (pixelGrid, pixelSoftness, pixelOverrides) => set({
+    pixelGrid: cloneMatrix(pixelGrid), pixelSoftness: cloneSoftnessMatrix(pixelSoftness), pixelOverrides: cloneOverrideMatrix(pixelOverrides),
   }),
   goToHistory: (historyIndex) => set((state) => {
     if (historyIndex < 0 || historyIndex >= state.history.length) return state;

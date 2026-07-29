@@ -1,11 +1,12 @@
 import { getToken } from "@/lib/auth";
-import { usePixelEditorStore } from "@/lib/pixel-editor-store";
+import { usePixelEditorStore, type PixelGrid, type PixelOverrideMatrix, type SoftnessMatrix } from "@/lib/pixel-editor-store";
 
 export interface CollaborationUser { userId?: number; username: string; key?: string; }
 export interface RenderedCollaborationUser extends CollaborationUser { key: string; }
 export interface PixelChange { x: number; y: number; color: string; softness: number; overridden: boolean; }
+export interface CollaborationVersion { id?: number; versionNumber: number; description: string; creatorId: number; createTime: string; }
 export interface CollaborationEvent {
-  type: "ROOM_STATE" | "PIXEL_UPDATE" | "CURSOR_UPDATE";
+  type: "ROOM_STATE" | "CANVAS_STATE" | "PIXEL_UPDATE" | "PIXEL_BATCH" | "VERSION_SAVED" | "CURSOR_UPDATE";
   onlineUsers?: CollaborationUser[];
   currentVersion?: number;
   userId?: number;
@@ -15,6 +16,11 @@ export interface CollaborationEvent {
   color?: string;
   softness?: number;
   overridden?: boolean;
+  pixelGrid?: PixelGrid;
+  pixelSoftness?: SoftnessMatrix;
+  pixelOverrides?: PixelOverrideMatrix;
+  changes?: PixelChange[];
+  version?: CollaborationVersion;
 }
 
 export const LOCAL_PIXEL_CHANGE_EVENT = "pixelverse:local-pixel-changes";
@@ -45,15 +51,30 @@ export function collaborationSocketUrl(artworkId: number) {
   return `${base.replace(/^http/, "ws")}/ws/artwork/${artworkId}?token=${encodeURIComponent(getToken() || "")}`;
 }
 
-export function applyRemotePixelUpdate(event: CollaborationEvent) {
-  if (typeof event.x !== "number" || typeof event.y !== "number" || !event.color) return;
+export function applyRemotePixelUpdates(event: CollaborationEvent) {
+  const changes = event.changes || (typeof event.x === "number" && typeof event.y === "number" && event.color
+    ? [{ x: event.x, y: event.y, color: event.color, softness: event.softness ?? 0, overridden: event.overridden ?? true }]
+    : []);
+  if (!changes.length) return;
   const state = usePixelEditorStore.getState();
-  if (!state.pixelGrid[event.y] || state.pixelGrid[event.y][event.x] === undefined) return;
   const pixels = state.pixelGrid.map((row) => [...row]);
   const softness = state.pixelSoftness.map((row) => [...row]);
   const overrides = state.pixelOverrides.map((row) => [...row]);
-  pixels[event.y][event.x] = event.color;
-  softness[event.y][event.x] = event.softness ?? 0;
-  overrides[event.y][event.x] = event.overridden ?? true;
-  state.commitPixelGrid(pixels, softness, overrides, { action: "pixel_change", description: `${event.username || "Collaborator"} edited (${event.x}, ${event.y})` });
+  let applied = 0;
+  changes.forEach((change) => {
+    if (!pixels[change.y] || pixels[change.y][change.x] === undefined) return;
+    pixels[change.y][change.x] = change.color;
+    softness[change.y][change.x] = change.softness ?? 0;
+    overrides[change.y][change.x] = change.overridden ?? true;
+    applied += 1;
+  });
+  if (applied) state.replaceCollaborationGrid(pixels, softness, overrides);
+}
+
+/** Applies the room's current image when a collaborator joins after earlier edits were made. */
+export function applyRemoteCanvasState(event: CollaborationEvent) {
+  if (!Array.isArray(event.pixelGrid) || !Array.isArray(event.pixelSoftness) || !Array.isArray(event.pixelOverrides)) return;
+  const state = usePixelEditorStore.getState();
+  if (event.pixelGrid.length !== state.gridHeight || event.pixelGrid.some((row) => !Array.isArray(row) || row.length !== state.gridWidth)) return;
+  state.replaceCollaborationGrid(event.pixelGrid, event.pixelSoftness, event.pixelOverrides);
 }

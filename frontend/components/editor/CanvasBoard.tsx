@@ -57,6 +57,7 @@ export default function CanvasBoard() {
   const changedCellsRef = useRef<ChangedCell[]>([]);
   const changedCellKeysRef = useRef(new Set<string>());
   const pendingDrawCellsRef = useRef<ChangedCell[]>([]);
+  const pendingBroadcastCellsRef = useRef<ChangedCell[]>([]);
   const lastPixelRef = useRef<GridPoint | null>(null);
   const activePointerIdRef = useRef<number | null>(null);
   const draftFrameRef = useRef<number | null>(null);
@@ -284,12 +285,22 @@ export default function CanvasBoard() {
     if (draftFrameRef.current !== null) return;
     draftFrameRef.current = requestAnimationFrame(() => {
       draftFrameRef.current = null;
-      const matrix = draftRef.current;
-      const softness = draftSoftnessRef.current;
-      const overrides = draftOverridesRef.current;
-      const changed = pendingDrawCellsRef.current.splice(0);
-      if (matrix && softness && overrides && changed.length) redrawCells(changed, matrix, softness, overrides);
+      flushDraftChanges();
     });
+  }
+
+  /** Render and publish the current batch together. This keeps a held mouse stroke live for collaborators. */
+  function flushDraftChanges() {
+    const matrix = draftRef.current;
+    const softness = draftSoftnessRef.current;
+    const overrides = draftOverridesRef.current;
+    const changed = pendingDrawCellsRef.current.splice(0);
+    const broadcasts = pendingBroadcastCellsRef.current.splice(0);
+    if (!matrix || !softness || !overrides) return;
+    if (changed.length) redrawCells(changed, matrix, softness, overrides);
+    if (broadcasts.length) {
+      emitLocalPixelChanges(broadcasts.map(({ x, y }) => ({ x, y, color: matrix[y][x], softness: softness[y][x], overridden: overrides[y][x] })));
+    }
   }
 
   function drawLine(from: GridPoint, to: GridPoint) {
@@ -312,6 +323,7 @@ export default function CanvasBoard() {
         changedCellsRef.current.push({ x, y });
       }
       pendingDrawCellsRef.current.push({ x, y });
+      pendingBroadcastCellsRef.current.push({ x, y });
       changed = true;
     });
     if (changed) { changedRef.current = true; scheduleDraftRender(); }
@@ -341,6 +353,7 @@ export default function CanvasBoard() {
     changedCellsRef.current = [];
     changedCellKeysRef.current = new Set();
     pendingDrawCellsRef.current = [];
+    pendingBroadcastCellsRef.current = [];
     draftRef.current = pixelGrid.map((row) => [...row]);
     draftSoftnessRef.current = pixelSoftness.map((row) => [...row]);
     draftOverridesRef.current = pixelOverrides.map((row) => [...row]);
@@ -372,14 +385,28 @@ export default function CanvasBoard() {
       const action = tool === "eraser" ? "恢复" : "修改";
       const color = tool === "eraser" ? "初始颜色" : selectedColor;
       const description = cells.length === 1 && first ? `${action}坐标(${first.x},${first.y})像素颜色为${color}` : `${action}${cells.length}个像素颜色为${color}`;
-      commitPixelGrid(draftRef.current, draftSoftnessRef.current, draftOverridesRef.current, { action: "pixel_change", description });
-      emitLocalPixelChanges(cells.map(({ x, y }) => ({ x, y, color: draftRef.current![y][x], softness: draftSoftnessRef.current![y][x], overridden: draftOverridesRef.current![y][x] })));
+      // A click can finish before its animation frame runs, so flush before clearing the draft.
+      if (draftFrameRef.current !== null) { cancelAnimationFrame(draftFrameRef.current); draftFrameRef.current = null; }
+      flushDraftChanges();
+      // Keep updates received from collaborators while this stroke was in progress. Only the cells
+      // touched by this stroke are allowed to replace the latest shared canvas.
+      const latest = usePixelEditorStore.getState();
+      const nextPixels = latest.pixelGrid.map((row) => [...row]);
+      const nextSoftness = latest.pixelSoftness.map((row) => [...row]);
+      const nextOverrides = latest.pixelOverrides.map((row) => [...row]);
+      cells.forEach(({ x, y }) => {
+        nextPixels[y][x] = draftRef.current![y][x];
+        nextSoftness[y][x] = draftSoftnessRef.current![y][x];
+        nextOverrides[y][x] = draftOverridesRef.current![y][x];
+      });
+      commitPixelGrid(nextPixels, nextSoftness, nextOverrides, { action: "pixel_change", description });
     }
     drawingRef.current = false;
     changedRef.current = false;
     changedCellsRef.current = [];
     changedCellKeysRef.current = new Set();
     pendingDrawCellsRef.current = [];
+    pendingBroadcastCellsRef.current = [];
     lastPixelRef.current = null;
     activePointerIdRef.current = null;
     if (draftFrameRef.current !== null) { cancelAnimationFrame(draftFrameRef.current); draftFrameRef.current = null; }
