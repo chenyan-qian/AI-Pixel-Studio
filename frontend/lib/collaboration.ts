@@ -4,9 +4,10 @@ import { usePixelEditorStore, type PixelGrid, type PixelOverrideMatrix, type Sof
 export interface CollaborationUser { userId?: number; username: string; key?: string; }
 export interface RenderedCollaborationUser extends CollaborationUser { key: string; }
 export interface PixelChange { x: number; y: number; color: string; softness: number; overridden: boolean; }
+export interface CollaborationHistoryCommit { action: "pixel_change"; description: string; }
 export interface CollaborationVersion { id?: number; versionNumber: number; description: string; creatorId: number; createTime: string; }
 export interface CollaborationEvent {
-  type: "ROOM_STATE" | "CANVAS_STATE" | "PIXEL_UPDATE" | "PIXEL_BATCH" | "VERSION_SAVED" | "CURSOR_UPDATE";
+  type: "ROOM_STATE" | "CANVAS_STATE" | "PIXEL_UPDATE" | "PIXEL_BATCH" | "HISTORY_COMMIT" | "VERSION_SAVED" | "CURSOR_UPDATE";
   onlineUsers?: CollaborationUser[];
   currentVersion?: number;
   userId?: number;
@@ -21,9 +22,11 @@ export interface CollaborationEvent {
   pixelOverrides?: PixelOverrideMatrix;
   changes?: PixelChange[];
   version?: CollaborationVersion;
+  history?: CollaborationHistoryCommit;
 }
 
 export const LOCAL_PIXEL_CHANGE_EVENT = "pixelverse:local-pixel-changes";
+export const LOCAL_HISTORY_COMMIT_EVENT = "pixelverse:local-history-commit";
 
 function clientUuid() {
   return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
@@ -44,6 +47,10 @@ export function normalizeOnlineUsers(users: CollaborationUser[]): RenderedCollab
 
 export function emitLocalPixelChanges(changes: PixelChange[]) {
   if (typeof window !== "undefined" && changes.length) window.dispatchEvent(new CustomEvent<PixelChange[]>(LOCAL_PIXEL_CHANGE_EVENT, { detail: changes }));
+}
+
+export function emitLocalHistoryCommit(commit: CollaborationHistoryCommit) {
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent<CollaborationHistoryCommit>(LOCAL_HISTORY_COMMIT_EVENT, { detail: commit }));
 }
 
 export function collaborationSocketUrl(artworkId: number) {
@@ -77,4 +84,12 @@ export function applyRemoteCanvasState(event: CollaborationEvent) {
   const state = usePixelEditorStore.getState();
   if (event.pixelGrid.length !== state.gridHeight || event.pixelGrid.some((row) => !Array.isArray(row) || row.length !== state.gridWidth)) return;
   state.replaceCollaborationGrid(event.pixelGrid, event.pixelSoftness, event.pixelOverrides);
+}
+
+/** A remote stroke becomes one history entry after all of its pixel batches have been applied. */
+export function applyRemoteHistoryCommit(event: CollaborationEvent) {
+  const history = event.history;
+  if (!history || history.action !== "pixel_change" || !history.description) return;
+  const state = usePixelEditorStore.getState();
+  state.commitPixelGrid(state.pixelGrid, state.pixelSoftness, state.pixelOverrides, history);
 }

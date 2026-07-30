@@ -4,7 +4,7 @@ import { Maximize, Minus, Plus } from "lucide-react";
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getPixelBlockCoordinates, TRANSPARENT, type PixelMatrix, type PixelOverrideMatrix, type SoftnessMatrix, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import { useTheme } from "@/context/ThemeContext";
-import { emitLocalPixelChanges } from "@/lib/collaboration";
+import { emitLocalHistoryCommit, emitLocalPixelChanges } from "@/lib/collaboration";
 
 const ZOOM_LEVELS = Array.from({ length: 32 }, (_, index) => (index + 1) * 25);
 const MIN_ZOOM = 1;
@@ -400,6 +400,7 @@ export default function CanvasBoard() {
         nextOverrides[y][x] = draftOverridesRef.current![y][x];
       });
       commitPixelGrid(nextPixels, nextSoftness, nextOverrides, { action: "pixel_change", description });
+      emitLocalHistoryCommit({ action: "pixel_change", description });
     }
     drawingRef.current = false;
     changedRef.current = false;

@@ -51,6 +51,12 @@ public class ArtworkWebSocketHandler extends TextWebSocketHandler {
         JsonNode event = objectMapper.readTree(message.getPayload());
         String type = event.path("type").asText();
         if ("CURSOR_UPDATE".equals(type)) { broadcast(room, Map.of("type", "CURSOR_UPDATE", "userId", userId(session), "username", username(session), "x", event.path("x").asInt(), "y", event.path("y").asInt()), session.getId()); return; }
+        if ("HISTORY_COMMIT".equals(type)) {
+            String description = event.path("history").path("description").asText("").trim();
+            if (description.isEmpty() || description.length() > 300) return;
+            broadcastHistoryCommit(room, artworkId, description, session.getId());
+            return;
+        }
         JsonNode changes;
         if ("PIXEL_UPDATE".equals(type)) changes = objectMapper.createArrayNode().add(event);
         else if ("PIXEL_BATCH".equals(type) && event.path("changes").isArray()) changes = event.path("changes");
@@ -108,6 +114,18 @@ public class ArtworkWebSocketHandler extends TextWebSocketHandler {
         versionPayload.put("createTime", version.getCreateTime() == null ? null : version.getCreateTime().toString());
         try { broadcast(room, Map.of("type", "VERSION_SAVED", "artworkId", artworkId, "version", versionPayload), null); }
         catch (IOException exception) { throw new IllegalStateException("Unable to broadcast saved version", exception); }
+    }
+
+    /** Adds one shared timeline record after a collaborator finishes a stroke. */
+    public void broadcastHistoryCommit(Long artworkId, String description) {
+        Room room = rooms.get(artworkId);
+        if (room == null) return;
+        try { broadcastHistoryCommit(room, artworkId, description, null); }
+        catch (IOException exception) { throw new IllegalStateException("Unable to broadcast collaboration history", exception); }
+    }
+    private void broadcastHistoryCommit(Room room, Long artworkId, String description, String excludedSessionId) throws IOException {
+        Map<String, Object> history = Map.of("action", "pixel_change", "description", description);
+        broadcast(room, Map.of("type", "HISTORY_COMMIT", "artworkId", artworkId, "history", history), excludedSessionId);
     }
 
     /** Replaces the authoritative in-memory room canvas after a version is restored, then publishes it to every member. */

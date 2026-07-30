@@ -12,6 +12,7 @@ import { downloadImage, exportPixelImage } from "@/lib/pixel-export";
 import { TRANSPARENT, usePixelEditorStore } from "@/lib/pixel-editor-store";
 import request from "@/lib/request";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import OperationNotice, { type NoticeTone, type OperationNoticeState } from "@/components/OperationNotice";
 import { buildWorkPayload, type WorkRecord } from "@/lib/work";
 
 interface SaveWorkResponse { code: number; msg: string; data: { id: number }; }
@@ -33,23 +34,24 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [saveMessage, setSaveMessage] = useState("");
+  const [notice, setNotice] = useState<OperationNoticeState | null>(null);
   const [collaborationEnabled, setCollaborationEnabled] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<WorkRecord["reviewStatus"]>(initialReviewStatus);
 
   useEffect(() => setReviewStatus(initialReviewStatus), [initialReviewStatus]);
 
+  function showNotice(message: string, tone: NoticeTone) { setNotice({ id: Date.now(), message, tone }); }
+
   async function exportImage(format: "png" | "jpg") {
     if (exporting) return;
     setExporting(true);
-    setSaveMessage("");
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
     try {
       const { pixelGrid, pixelOverrides, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight } = usePixelEditorStore.getState();
       const dataUrl = await exportPixelImage({ pixelGrid, pixelOverrides, pixelSoftness, gridWidth, gridHeight, canvasWidth, canvasHeight, sourceImageUrl, sourceWidth, sourceHeight, mimeType });
       downloadImage(dataUrl, format);
     } catch (error) {
-      setSaveMessage(error instanceof Error ? error.message : "导出失败，请稍后重试。");
+      showNotice(error instanceof Error ? error.message : "导出失败，请稍后重试。", "error");
     } finally {
       setExporting(false);
     }
@@ -57,11 +59,10 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
 
   async function saveWork(): Promise<boolean> {
     if (collaborationMode) {
-      setSaveMessage("协作画布请使用顶部的保存版本按钮");
+      showNotice("协作画布请使用顶部的保存版本按钮", "info");
       return false;
     }
     setSaving(true);
-    setSaveMessage("");
     // 保存当前画布以及当前可见的历史分支，已压缩的历史节点继续沿用压缩数据。
     const payload = buildWorkPayload(usePixelEditorStore.getState());
     try {
@@ -72,11 +73,11 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
       if (response.code !== 200 || !response.data) throw new Error(response.msg || "保存失败");
       setWorkId(response.data.id);
       if (reviewStatus === "PUBLISHED") setReviewStatus("DRAFT");
-      setSaveMessage("已保存");
+      showNotice("作品已保存", "success");
       return true;
     } catch (error) {
       const message = (error as { response?: { data?: { msg?: string } } })?.response?.data?.msg;
-      setSaveMessage(message || (error instanceof Error ? error.message : "保存失败"));
+      showNotice(message || (error instanceof Error ? error.message : "保存失败"), "error");
       return false;
     } finally { setSaving(false); }
   }
@@ -93,9 +94,9 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
       const response = await request.post(`/api/work/${savedWorkId}/submit`) as unknown as { code: number; msg: string };
       if (response.code === 200) setReviewStatus("PENDING");
       if (response.code !== 200) throw new Error(response.msg || "提交审核失败");
-      setSaveMessage("已提交管理员审核");
+      showNotice("已提交发布审核", "success");
     } catch (error) {
-      setSaveMessage(error instanceof Error ? error.message : "提交审核失败");
+      showNotice(error instanceof Error ? error.message : "提交审核失败", "error");
     } finally { setPublishing(false); }
   }
 
@@ -103,19 +104,19 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
     if (!workId || publishing) return;
     if (!window.confirm("确认下架这件作品？下架后将不再显示在社区。")) return;
     setPublishing(true);
-    setSaveMessage("");
     try {
       const response = await request.post(`/api/work/${workId}/unpublish`) as unknown as { code: number; msg: string };
       if (response.code !== 200) throw new Error(response.msg || "Unable to unpublish work");
       setReviewStatus("DRAFT");
-      setSaveMessage("作品已下架");
+      showNotice("作品已下架", "success");
     } catch (error) {
-      setSaveMessage(error instanceof Error ? error.message : "Unable to unpublish work");
+      showNotice(error instanceof Error ? error.message : "作品下架失败", "error");
     } finally { setPublishing(false); }
   }
 
   return (
     <main className="flex min-h-screen flex-col bg-[#08090d] text-zinc-100">
+      <OperationNotice notice={notice} onClose={() => setNotice(null)} />
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.1] bg-[#101119] px-4">
         <div className="flex items-center gap-4"><Link href="/workspace" className="text-sm font-semibold text-white">PixelVerse</Link><span className="border-l border-white/[0.12] pl-4 text-xs text-zinc-500">{gridWidth} × {gridHeight} 格 · {pixelSize}px 像素编辑器</span></div>
         <div className="flex items-center gap-2"><ThemeToggle /><button type="button" onClick={saveWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-violet-400/50 bg-violet-400/10 px-2.5 text-xs text-violet-100 hover:bg-violet-400/20 disabled:opacity-50"><Save className="size-3.5" />{saving ? "保存中" : "保存"}</button>{reviewStatus === "PUBLISHED" ? <button type="button" onClick={unpublishWork} disabled={saving || publishing} className="inline-flex h-8 items-center gap-1.5 border border-amber-400/50 bg-amber-400/10 px-2.5 text-xs text-amber-100 hover:bg-amber-400/20 disabled:opacity-50"><Archive className="size-3.5" />{publishing ? "下架中" : "下架"}</button> : <button type="button" onClick={submitForReview} disabled={saving || publishing || reviewStatus === "PENDING"} className="inline-flex h-8 items-center gap-1.5 border border-cyan-400/50 bg-cyan-400/10 px-2.5 text-xs text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-50"><Send className="size-3.5" />{publishing ? "提交中" : reviewStatus === "PENDING" ? "审核中" : "提交发布"}</button>}<button type="button" onClick={() => exportImage("png")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><Download className="size-3.5" />{exporting ? "导出中" : "PNG"}</button><button type="button" onClick={() => exportImage("jpg")} disabled={exporting} className="inline-flex h-8 items-center gap-1.5 border border-white/[0.14] px-2.5 text-xs text-zinc-200 hover:border-violet-400 disabled:opacity-50"><ImageDown className="size-3.5" />JPG</button></div>
@@ -127,8 +128,8 @@ export default function PixelEditor({ collaborationMode = false, initialReviewSt
         <aside className="border-t border-white/[0.1] bg-[#101119] p-4 lg:overflow-y-auto lg:border-l lg:border-t-0">
           <ColorPicker />
           <Palette />
-          <HistoryPanel />
-          {saveMessage && <p className={`mt-3 text-[11px] ${saveMessage === "已保存" ? "text-emerald-300" : "text-rose-300"}`} role="status">{saveMessage}</p>}<section className="border-t border-white/[0.1] pt-4"><h3 className="text-xs font-medium text-zinc-300">当前像素</h3>{hoveredPixel ? <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs"><dt className="text-zinc-500">坐标</dt><dd className="font-mono text-zinc-200">{hoveredPixel.x}, {hoveredPixel.y}</dd><dt className="text-zinc-500">RGB</dt><dd className="font-mono text-zinc-200">{toRgbText(hoveredPixel.color)}</dd><dt className="text-zinc-500">HEX</dt><dd className="font-mono text-zinc-200">{hoveredPixel.color === TRANSPARENT ? "透明" : hoveredPixel.color}</dd></dl> : <p className="mt-3 text-xs text-zinc-600">移动到画布查看像素信息</p>}</section>
+          <HistoryPanel collaborationMode={collaborationMode} />
+          <section className="border-t border-white/[0.1] pt-4"><h3 className="text-xs font-medium text-zinc-300">当前像素</h3>{hoveredPixel ? <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs"><dt className="text-zinc-500">坐标</dt><dd className="font-mono text-zinc-200">{hoveredPixel.x}, {hoveredPixel.y}</dd><dt className="text-zinc-500">RGB</dt><dd className="font-mono text-zinc-200">{toRgbText(hoveredPixel.color)}</dd><dt className="text-zinc-500">HEX</dt><dd className="font-mono text-zinc-200">{hoveredPixel.color === TRANSPARENT ? "透明" : hoveredPixel.color}</dd></dl> : <p className="mt-3 text-xs text-zinc-600">移动到画布查看像素信息</p>}</section>
         </aside>
       </div>
     </main>

@@ -32,6 +32,7 @@ public class CollaborationController {
     @PostMapping("/{artworkId}/versions/{versionNumber}/restore") public Result<ArtworkVersion> restore(@PathVariable Long artworkId, @PathVariable Long versionNumber, HttpServletRequest request) {
         ArtworkVersion restored = collaborationService.restoreVersion(artworkId, versionNumber, userId(request));
         artworkWebSocketHandler.replaceCanvasFromVersion(artworkId, restored.getSnapshotUrl());
+        artworkWebSocketHandler.broadcastHistoryCommit(artworkId, "恢复版本 V" + versionNumber);
         return Result.success(restored);
     }
     private Long userId(HttpServletRequest request) { return (Long) request.getAttribute("userId"); }
