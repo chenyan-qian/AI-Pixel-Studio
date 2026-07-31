@@ -7,6 +7,8 @@ USE ai_pixel_studio;
 CREATE TABLE IF NOT EXISTS `user` (
   id BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
   username VARCHAR(32) NOT NULL COMMENT 'Unique account name',
+  email VARCHAR(254) NOT NULL COMMENT 'Verified login email',
+  email_verified TINYINT NOT NULL DEFAULT 0 COMMENT '0 unverified, 1 verified',
   password VARCHAR(100) NOT NULL COMMENT 'BCrypt password hash',
   nickname VARCHAR(32) NOT NULL COMMENT 'Display name',
   avatar VARCHAR(500) DEFAULT NULL COMMENT 'Avatar URL',
@@ -15,8 +17,21 @@ CREATE TABLE IF NOT EXISTS `user` (
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY uk_user_username (username)
+  UNIQUE KEY uk_user_username (username),
+  UNIQUE KEY uk_user_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Application users';
+
+CREATE TABLE IF NOT EXISTS email_code (
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  email VARCHAR(254) NOT NULL,
+  code CHAR(6) NOT NULL,
+  expire_time DATETIME NOT NULL,
+  used TINYINT NOT NULL DEFAULT 0 COMMENT '0 unused, 1 used or invalidated',
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_email_code_email_time (email, create_time),
+  KEY idx_email_code_lookup (email, code, used, expire_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Email verification codes';
 
 CREATE TABLE IF NOT EXISTS `works` (
   id BIGINT NOT NULL AUTO_INCREMENT,

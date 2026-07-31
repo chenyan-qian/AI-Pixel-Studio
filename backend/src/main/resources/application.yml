@@ -14,6 +14,18 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 mybatis-plus:
   configuration:
@@ -23,3 +35,6 @@ jwt:
   # Use a 32+ character high-entropy secret in production via JWT_SECRET or external config.
   secret: ${JWT_SECRET:change-this-development-secret-key-to-a-strong-32-byte-value}
   expiration: 604800000
+
+mail:
+  from: ${MAIL_FROM:${MAIL_USERNAME:}}
