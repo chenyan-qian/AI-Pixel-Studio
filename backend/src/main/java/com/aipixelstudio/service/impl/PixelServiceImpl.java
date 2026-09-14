@@ -20,6 +20,7 @@ public class PixelServiceImpl implements PixelService {
     private static final Set<Integer> SUPPORTED_PIXEL_SIZES = Set.of(1, 2, 4, 8, 16, 32, 64);
     /** 防止超大图片在遍历或解码时消耗过多内存。 */
     private static final long MAX_IMAGE_PIXELS = 20_000_000L;
+    private static final char[] HEX = "0123456789ABCDEF".toCharArray();
 
     @Override
     public PixelResultDTO analyze(MultipartFile file, int pixelSize) {
@@ -72,7 +73,15 @@ public class PixelServiceImpl implements PixelService {
 
     private String toHexColor(int rgb) {
         // BufferedImage 返回 ARGB 整数；编辑器只保存不透明的 RGB 十六进制颜色。
-        return String.format("#%02X%02X%02X", (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+        int red = (rgb >> 16) & 0xFF;
+        int green = (rgb >> 8) & 0xFF;
+        int blue = rgb & 0xFF;
+        char[] value = {
+                '#', HEX[red >>> 4], HEX[red & 0x0F],
+                HEX[green >>> 4], HEX[green & 0x0F],
+                HEX[blue >>> 4], HEX[blue & 0x0F]
+        };
+        return new String(value);
     }
 
     private void validateFile(MultipartFile file) {

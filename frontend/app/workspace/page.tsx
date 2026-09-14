@@ -113,7 +113,7 @@ export default function WorkspacePage() {
     formData.append("pixelSize", String(pixelSize));
 
     try {
-      const response = await request.post<FormData, PixelAnalyzeResponse>("/api/pixel/analyze", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      const response = await request.post<FormData, PixelAnalyzeResponse>("/api/pixel/analyze", formData, { headers: { "Content-Type": "multipart/form-data" }, timeout: 120000 });
       if (response.code !== 200 || !response.data?.pixels) throw new Error(response.msg || "像素网格生成失败，请稍后重试。");
       // 矩阵写入全局编辑器状态后跳转，编辑页不再依赖图片文件或处理结果图片。
       // 使用服务端图片地址而非本地 Blob URL，页面跳转后底图仍可正常加载。
