@@ -88,7 +88,11 @@ public class CollaborationService {
     }
 
     public List<ArtworkVersion> versions(Long artworkId) {
-        return versionMapper.selectList(Wrappers.<ArtworkVersion>lambdaQuery().eq(ArtworkVersion::getArtworkId, artworkId).orderByDesc(ArtworkVersion::getVersionNumber));
+        return versionMapper.selectList(Wrappers.<ArtworkVersion>lambdaQuery()
+                .select(ArtworkVersion::getId, ArtworkVersion::getArtworkId, ArtworkVersion::getVersionNumber,
+                        ArtworkVersion::getCreatorId, ArtworkVersion::getDescription, ArtworkVersion::getCreateTime)
+                .eq(ArtworkVersion::getArtworkId, artworkId)
+                .orderByDesc(ArtworkVersion::getVersionNumber));
     }
 
     public void recordOperation(Long artworkId, Long userId, int x, int y, String oldColor, String newColor) {

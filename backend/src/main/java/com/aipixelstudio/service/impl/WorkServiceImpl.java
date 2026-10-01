@@ -158,6 +158,9 @@ public class WorkServiceImpl implements WorkService {
     @Override
     public List<Work> publishedWorks() {
         return workMapper.selectList(Wrappers.<Work>lambdaQuery()
+                .select(Work::getId, Work::getUserId, Work::getTitle, Work::getPixelSize,
+                        Work::getSourceImageUrl, Work::getPixelImageUrl, Work::getImageWidth,
+                        Work::getImageHeight, Work::getPublishedTime, Work::getCreateTime)
                 .eq(Work::getReviewStatus, "PUBLISHED")
                 .orderByDesc(Work::getPublishedTime));
     }

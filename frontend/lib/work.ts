@@ -20,6 +20,45 @@ export interface WorkRecord {
   updateTime: string;
 }
 
+export interface CommunityArtworkRecord {
+  id: number;
+  title: string;
+  sourceImageUrl: string | null;
+  pixelImageUrl: string | null;
+  pixelSize: number;
+  imageWidth: number;
+  imageHeight: number;
+  gridWidth: number;
+  gridHeight: number;
+  canvasWidth: number;
+  canvasHeight: number;
+  publishedTime: string | null;
+  createTime: string;
+}
+
+export interface CommunityVersion {
+  id: number;
+  versionNumber: number;
+  creatorId: number;
+  creator: string;
+  description: string;
+  createTime: string;
+  width: number;
+  height: number;
+}
+
+export interface CommunityArtworkDetail {
+  artwork: CommunityArtworkRecord;
+  username: string;
+  avatar: string | null;
+  permission: { visibility: "PRIVATE" | "PUBLIC" | "PUBLIC_COLLAB"; allowEdit: boolean; allowFork: boolean };
+  onlineCount: number;
+  modificationCount: number;
+  latestVersion: CommunityVersion | null;
+  versions: CommunityVersion[];
+  contributors: Array<{ userId: number; username: string; avatar: string | null; pixelCount: number }>;
+}
+
 export interface CommunityWork {
   id: number;
   title: string;
